@@ -76,8 +76,8 @@ class Prefs(private val sp: Settings, private val systemChinese: Boolean) {
         get() = sp.getInt("stackBB", 100)
         set(v) = sp.putInt("stackBB", v)
     var lastTableType: TableType
-        get() = if (sp.getString("table", "G") == "M") TableType.MIXED else TableType.GTO
-        set(v) = sp.putString("table", if (v == TableType.MIXED) "M" else "G")
+        get() = when (sp.getString("table", "G")) { "S" -> TableType.STARS; "M" -> TableType.MIXED; else -> TableType.GTO }
+        set(v) = sp.putString("table", when (v) { TableType.STARS -> "S"; TableType.MIXED -> "M"; TableType.GTO -> "G" })
     var lastHandsPerLevel: Int
         get() = sp.getInt("hpl", 10)
         set(v) = sp.putInt("hpl", v)

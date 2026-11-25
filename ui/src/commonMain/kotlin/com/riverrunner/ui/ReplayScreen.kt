@@ -88,7 +88,7 @@ internal fun sizeName(st: Strings, c: SizeClass): String = when (c) {
 /** Builds the table picture for one replay frame. */
 fun replayTable(st: Strings, record: HandRecord, frames: List<ReplayFrame>, idx: Int, equities: Map<Int, Double>?, fmt: (Int) -> String): TableUi {
     val frame = frames[idx]
-    val names = record.players.associate { it.seat to if (it.seat == record.heroSeat) st.you else it.name }
+    val names = record.players.associate { it.seat to if (it.seat == record.heroSeat) st.you else com.riverrunner.engine.StarProfiles.byId(it.starId)?.display(st.isZh)?.substringBefore(" ·") ?: it.name }
     val styles = record.players.associate { it.seat to it.style }
     val seatsInOrder = record.players.map { it.seat }.sorted()
     val btnIdx = seatsInOrder.indexOf(record.buttonSeat)
@@ -117,6 +117,7 @@ fun replayTable(st: Strings, record: HandRecord, frames: List<ReplayFrame>, idx:
         val a = if (frame.isEnd) null else last[p.seat]
         SeatUi(
             seat = p.seat, name = names.getValue(p.seat), stack = p.stack,
+            starId = record.players.firstOrNull { it.seat == p.seat }?.starId,
             streetBet = if (frame.isEnd) 0 else p.streetBet,
             folded = p.folded, allIn = p.allIn, isHero = p.seat == record.heroSeat,
             isButton = p.seat == record.buttonSeat, isActing = !frame.isEnd && frame.toAct == p.seat,
@@ -135,7 +136,7 @@ fun replayTable(st: Strings, record: HandRecord, frames: List<ReplayFrame>, idx:
 }
 
 fun replayLog(st: Strings, record: HandRecord, frames: List<ReplayFrame>, fmt: (Int) -> String): List<LogLine> {
-    val names = record.players.associate { it.seat to if (it.seat == record.heroSeat) st.you else it.name }
+    val names = record.players.associate { it.seat to if (it.seat == record.heroSeat) st.you else com.riverrunner.engine.StarProfiles.byId(it.starId)?.display(st.isZh)?.substringBefore(" ·") ?: it.name }
     return frames.mapIndexed { i, f ->
         val a = f.action
         when {

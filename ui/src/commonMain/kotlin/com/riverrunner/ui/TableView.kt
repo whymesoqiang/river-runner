@@ -74,12 +74,12 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 /** All positions on the table in dp, for a table area of [w] x [h] with [n] seats (hero at the bottom). */
-class TableGeometry(val w: Float, val h: Float, val n: Int) {
+class TableGeometry(val w: Float, val h: Float, val n: Int, val stars: Boolean = false) {
     /** 7-8 players or a narrow table: smaller seats and board */
     val crowded = n >= 7 || w < 520f
     val cx = w / 2f
     val cy = h * 0.43f
-    val podW = if (crowded) 100f else 112f
+    val podW = (if (crowded) 100f else 112f) + if (stars) 30f else 0f
     val podH = 46f
     val miniCardW = if (crowded) 22f else 24f
     val boardCardW = if (crowded) 32f else if (w < 520f || h < 320f) 34f else 38f
@@ -104,8 +104,11 @@ class TableGeometry(val w: Float, val h: Float, val n: Int) {
     fun seatCenter(rel: Int): Offset {
         if (rel == 0) return heroPod
         val ang = (90.0 + rel * 360.0 / n) * kotlin.math.PI / 180.0
-        val x = cx + (w / 2 - podW / 2 - 6f) * cos(ang).toFloat()
-        val y = cy + h * 0.45f * sin(ang).toFloat()
+        // Eight-star tables have three top pods; spread diagonal seats to keep portraits and cards apart.
+        val spread = if (stars && n == 8) 1.35f else 1f
+        val x = cx + (w / 2 - podW / 2 - 6f) * cos(ang).toFloat() * spread
+        val y = cy + h * 0.45f * sin(ang).toFloat() -
+            if (stars && n == 8 && (rel == 1 || rel == n - 1)) 18f else 0f
         return Offset(
             x.coerceIn(podW / 2 + 8f, w - podW / 2 - 4f),
             y.coerceIn(podH / 2 + 20f, h - podH / 2 - 18f),
@@ -217,7 +220,8 @@ fun PokerTable(
 ) {
     BoxWithConstraints(modifier) {
         val n = t.seats.size
-        val g = remember(maxWidth.value, maxHeight.value, n) { TableGeometry(maxWidth.value, maxHeight.value, n) }
+        val stars = t.seats.any { it.starId != null }
+        val g = remember(maxWidth.value, maxHeight.value, n, stars) { TableGeometry(maxWidth.value, maxHeight.value, n, stars) }
         val heroIndex = t.seats.indexOfFirst { it.isHero }.coerceAtLeast(0)
         fun rel(i: Int) = (i - heroIndex + n) % n
 
@@ -437,6 +441,7 @@ private fun SeatPod(s: SeatUi, g: TableGeometry, t: TableUi, fmt: (Int) -> Strin
     Box(Modifier.size((g.podW + 12).dp, (g.podH + 36).dp), contentAlignment = Alignment.Center) {
         PodFrame(s, pulse, Modifier.size(g.podW.dp, g.podH.dp).alpha(dimAlpha)) {
             Row(Modifier.fillMaxSize().padding(start = 8.dp, end = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                s.starId?.let { id -> StarPortrait(id, 26.dp); Spacer(Modifier.width(4.dp)) }
                 Column(Modifier.weight(1f)) {
                     Text(s.name, color = Palette.Text, fontSize = 12.sp, lineHeight = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(

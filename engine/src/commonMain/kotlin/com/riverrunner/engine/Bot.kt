@@ -330,11 +330,13 @@ object Bot {
         style: BotStyle,
         random: Random,
         tournament: TournamentContext? = null,
+        personality: StarProfile? = null,
     ): Policy {
         val la = engine.legalActions()
         require(la.seat == seat)
-        val p = if (engine.street == Street.PREFLOP) preflop(engine, seat, style, la, random, tournament)
-        else postflop(engine, seat, style, la, random, tournament)
+        val traits = personality?.traits ?: BotTraits.from(style)
+        val p = if (engine.street == Street.PREFLOP) preflop(engine, seat, traits, la, random, tournament)
+        else postflop(engine, seat, traits, la, random, tournament)
         return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons, p.summary)
     }
 
@@ -436,7 +438,7 @@ object Bot {
     private fun pctText(value: Double) = "${kotlin.math.round(value * 1000) / 10}%"
     private fun number(value: Double) = "${kotlin.math.round(value * 100) / 100}"
 
-    private fun preflop(engine: HandEngine, seat: Int, style: BotStyle, la: LegalActions, random: Random, t: TournamentContext?): Policy {
+    private fun preflop(engine: HandEngine, seat: Int, style: BotTraits, la: LegalActions, random: Random, t: TournamentContext?): Policy {
         val me = engine.player(seat)
         val bb = engine.bigBlind
         val pct = HandClasses.percentile(me.hole[0], me.hole[1])
@@ -457,6 +459,19 @@ object Bot {
         ))
         fun explain(zh: String, en: String) { reasons += PolicyReason(zh, en) }
         var summary: PolicyReason? = null
+        // A short-stack persona changes action selection, not just the displayed label.
+        // Only public information and this player's own cards enter this branch.
+        if (style.shortStackPushBB > 0 && effBB <= style.shortStackPushBB && la.canRaise) {
+            val width = (pushWidth(effBB.coerceAtMost(20.0), behind) * style.looseness /
+                (1.0 + raises * 0.65)).coerceIn(0.025, 0.65)
+            val push = smooth(pct, width, 0.025)
+            opts += Move.raiseTo(la.maxRaiseTo) to push
+            opts += (if (la.canCheck) Move.CHECK else Move.FOLD) to (1 - push)
+            summary = PolicyReason("短码推牌设定：用全下施压，范围外保留筹码。", "Short-stack preset: shove for pressure, preserve chips outside the range.")
+            explain("有效筹码 ${number(effBB)} BB；推牌范围中心为前 ${pctText(width)}，面对加注收紧。", "Effective stack ${number(effBB)} BB; shove midpoint top ${pctText(width)}, tighter when facing raises.")
+            return Policy(normalized(opts), null, la.toCall.toDouble() / (la.pot + la.toCall), null,
+                reasons = reasons, summary = summary)
+        }
         // ---- big calls (facing a shove or a raise that commits a large part of the stack)
         if (la.toCall > 0 && (la.toCall >= me.stack * 0.4 || engine.players.any { it.allIn && !it.folded && it.seat != seat && it.streetBet >= la.currentBet })) {
             val opps = engine.players.filter { !it.folded && it.seat != seat }
@@ -521,7 +536,7 @@ object Bot {
                 opts += raiseMove(la, (openBB * m * bb).toInt()) to pRaise * w
             }
             // passive styles sometimes limp
-            if (style == BotStyle.STATION || style == BotStyle.MANIAC) {
+            if (style.limp) {
                 val pLimp = smooth(pct, thr * 1.5, 0.03) * (1 - pRaise) * 0.6
                 opts += Move.CALL to pLimp
                 opts += Move.FOLD to (1 - pRaise - pLimp)
@@ -606,7 +621,7 @@ object Bot {
         return Policy(normalized(opts), null, potOdds, null, reasons = reasons, summary = summary)
     }
 
-    private fun postflop(engine: HandEngine, seat: Int, style: BotStyle, la: LegalActions, random: Random, t: TournamentContext?): Policy {
+    private fun postflop(engine: HandEngine, seat: Int, style: BotTraits, la: LegalActions, random: Random, t: TournamentContext?): Policy {
         val me = engine.player(seat)
         val board = engine.board
         val street = engine.street
@@ -660,7 +675,7 @@ object Bot {
                     else -> 0.06
                 }
                 val medium = if (cls == 2 || cls == 3) 0.6 else 1.0  // medium hands prefer pot control
-                pBet = max(pBet, bluff * style.bluff * multi * medium)
+                pBet = max(pBet, bluff * style.bluff * multi * medium * (if (street == Street.TURN || street == Street.RIVER) style.lateBarrel else 1.0))
             }
             pBet = pBet.coerceIn(0.0, 0.97)
             if (spr < 1.3 && rel > valueThr) {

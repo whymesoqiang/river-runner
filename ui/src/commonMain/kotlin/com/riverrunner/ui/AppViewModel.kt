@@ -348,7 +348,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                 strings.hudShort((st.vpip * 100).roundToInt(), (st.pfr * 100).roundToInt())
             }
         } else null
-        SeatInfo(it.seat, if (it.isHuman) strings.you else it.name, it.isHuman, it.stack, !it.alive && it.place > 0, hud)
+        SeatInfo(it.seat, if (it.isHuman) strings.you else com.riverrunner.engine.StarProfiles.byId(it.starId)?.display(strings.isZh)?.substringBefore(" ·") ?: it.name, it.isHuman, it.stack, !it.alive && it.place > 0, hud, it.starId)
     }
 
     /** Re-maps the seats (e.g. after the HUD is switched) without changing the hand. */
@@ -364,7 +364,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
 
     private fun logAction(e: HandEngine, s: GameSession, a: Action) {
         if (a.type == ActionType.ANTE) return
-        val name = if (a.seat == GameSession.HERO_SEAT) strings.you else s.players[a.seat].name
+        val name = if (a.seat == GameSession.HERO_SEAT) strings.you else com.riverrunner.engine.StarProfiles.byId(s.players[a.seat].starId)?.display(strings.isZh)?.substringBefore(" ·") ?: s.players[a.seat].name
         val bb = e.bigBlind
         log += LogLine(LogKind.ACTION, "$name (${e.positionName(a.seat)}) ${TableMapper.actionLabel(strings, a) { fmt(it, bb) }}", a.seat)
     }
@@ -492,7 +492,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             }
                             if (e.player(seat).folded) heroInHand = false
                         } else {
-                            val name = s.players[seat].name
+                            val name = com.riverrunner.engine.StarProfiles.byId(s.players[seat].starId)?.display(strings.isZh)?.substringBefore(" ·") ?: s.players[seat].name
                             actingName = name
                             val think = if (fastForward) 0L else botDelay
                             publish(s, e, TableMapper.Stage.LIVE, think)
@@ -500,7 +500,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             val style = s.players[seat].style
                             val ctx = s.tournamentContext()
                             val move = withContext(Dispatchers.Default) {
-                                Bot.decide(e, seat, style, s.random, ctx).sample(s.random)
+                                Bot.decide(e, seat, style, s.random, ctx, com.riverrunner.engine.StarProfiles.byId(s.players[seat].starId)).sample(s.random)
                             }
                             pause(think - (nowMillis() - started))
                             apply(e, s, move)

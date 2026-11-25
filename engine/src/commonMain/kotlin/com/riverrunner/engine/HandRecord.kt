@@ -6,6 +6,7 @@ data class RecordPlayer(
     val style: BotStyle,
     val startStack: Int,
     val hole: IntArray,
+    val starId: String? = null,
 )
 
 /**
@@ -48,7 +49,7 @@ data class HandRecord(
             .append(handNumber).append('|').append(smallBlind).append('|').append(bigBlind).append('|')
             .append(ante).append('|').append(buttonSeat).append('|').append(heroSeat).append('|')
             .append(tableSize).append('|').append(if (favorite) 1 else 0).append('|')
-        sb.append(players.joinToString(";") { "${it.seat},${clean(it.name)},${it.style.code},${it.startStack},${Cards.format(it.hole)}" })
+        sb.append(players.joinToString(";") { "${it.seat},${clean(it.name)},${it.style.code},${it.startStack},${Cards.format(it.hole)}${it.starId?.let { id -> ",$id" } ?: ""}" })
         sb.append('|').append(Cards.format(board)).append('|')
         sb.append(actions.joinToString(";") {
             "${it.street.ordinal},${it.seat},${it.type.ordinal},${it.amount},${it.streetTotal},${if (it.allIn) 1 else 0}"
@@ -66,7 +67,7 @@ data class HandRecord(
             require(f[0] == "H1")
             val players = f[12].split(';').filter { it.isNotEmpty() }.map {
                 val p = it.split(',')
-                RecordPlayer(p[0].toInt(), p[1], BotStyle.fromCode(p[2]), p[3].toInt(), Cards.parseMany(p[4]))
+                RecordPlayer(p[0].toInt(), p[1], BotStyle.fromCode(p[2]), p[3].toInt(), Cards.parseMany(p[4]), p.getOrNull(5)?.takeIf { StarProfiles.byId(it) != null })
             }
             val actions = if (f[14].isEmpty()) emptyList() else f[14].split(';').map {
                 val a = it.split(',')
@@ -87,7 +88,7 @@ data class HandRecord(
             )
         } catch (e: Exception) { null }
 
-        fun from(engine: HandEngine, mode: GameMode, handNumber: Int, heroSeat: Int, tableSize: Int, styles: Map<Int, BotStyle>): HandRecord {
+        fun from(engine: HandEngine, mode: GameMode, handNumber: Int, heroSeat: Int, tableSize: Int, styles: Map<Int, BotStyle>, starIds: Map<Int, String> = emptyMap()): HandRecord {
             val now = nowMillis()
             return HandRecord(
                 id = now * 1000 + (handNumber % 1000),
@@ -100,7 +101,7 @@ data class HandRecord(
                 buttonSeat = engine.buttonSeat,
                 heroSeat = heroSeat,
                 tableSize = tableSize,
-                players = engine.players.map { RecordPlayer(it.seat, it.name, styles[it.seat] ?: BotStyle.GTO, it.startStack, it.hole) },
+                players = engine.players.map { RecordPlayer(it.seat, it.name, styles[it.seat] ?: BotStyle.GTO, it.startStack, it.hole, starIds[it.seat]) },
                 board = engine.board.toIntArray(),
                 actions = engine.actions.toList(),
                 won = engine.result?.won ?: emptyMap(),

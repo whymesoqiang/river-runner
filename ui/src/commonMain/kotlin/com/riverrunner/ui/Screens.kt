@@ -128,7 +128,7 @@ fun HomeScreen(vm: AppViewModel) {
                 ) {
                     Text(st.quickStart + "  ▶", color = Palette.Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     Text(
-                        summary.take(2).joinToString(if (st.isZh) "，" else ", "), color = Palette.Text.copy(alpha = 0.85f),
+                        (if (p.lastTableType == TableType.STARS) (if (st.isZh) "明星桌 · 随机阵容 · 你 ${p.lastStackBB} BB" else "Star table · random lineup · you ${p.lastStackBB} BB") else summary.take(2).joinToString(if (st.isZh) "，" else ", ")), color = Palette.Text.copy(alpha = 0.85f),
                         fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -206,17 +206,26 @@ fun SetupContent(initial: SessionConfig, onBack: () -> Unit, onStart: (SessionCo
             ) {
                 OptionRow(st.mode) {
                     Pill(st.cash, mode == GameMode.CASH, { mode = GameMode.CASH; if (stackBB !in cashStacks) stackBB = 100 })
-                    Pill(st.tournament, mode == GameMode.TOURNAMENT, { mode = GameMode.TOURNAMENT; if (stackBB !in tourneyStacks) stackBB = 50 })
+                    Pill(st.tournament, mode == GameMode.TOURNAMENT, { mode = GameMode.TOURNAMENT; if (table == TableType.STARS) table = TableType.MIXED; if (stackBB !in tourneyStacks) stackBB = 50 })
                 }
                 OptionRow(st.players) {
                     for (n in listOf(2, 5, 6, 7, 8)) Pill("$n", size == n, { size = n }, Modifier.width(52.dp))
                 }
-                OptionRow(st.stackLabelBB) {
+                OptionRow(if (table == TableType.STARS) (if (st.isZh) "你的筹码 BB" else "Your stack BB") else st.stackLabelBB) {
                     for (b in stackOptions) Pill("$b", stackBB == b, { stackBB = b }, Modifier.width(60.dp))
                 }
                 OptionRow(st.tableType) {
                     Pill(st.gtoTable, table == TableType.GTO, { table = TableType.GTO })
                     Pill(st.mixedTable, table == TableType.MIXED, { table = TableType.MIXED })
+                    Pill(if (st.isZh) "明星桌" else "Stars", table == TableType.STARS, {
+                        table = TableType.STARS; mode = GameMode.CASH
+                        if (stackBB !in cashStacks) stackBB = 100
+                    })
+                }
+                if (table == TableType.STARS) {
+                    Text(if (st.isZh) "固定盲注 · 随机抽取不同明星 · 对手按各自模拟牌风与买入入座"
+                        else "Cash game · distinct random stars · individual styles and buy-ins", color = Palette.TextDim, fontSize = 12.sp)
+                    StarRosterButton()
                 }
                 if (table == TableType.MIXED) {
                     OptionRow(st.lineup) {
@@ -269,7 +278,12 @@ fun SetupContent(initial: SessionConfig, onBack: () -> Unit, onStart: (SessionCo
         ) {
             val allLines = st.setupSummary(mode == GameMode.TOURNAMENT, size, stackBB, table == TableType.MIXED, hpl, ante)
             // for a mixed table the last line ("styles are random") is replaced by the line-up below
-            val lines = if (table == TableType.MIXED) allLines.dropLast(1) else allLines
+            val lines = when (table) {
+                TableType.STARS -> if (st.isZh) listOf("明星桌 · 固定盲注", "$bots 位明星随机入座", "你的买入：$stackBB BB", "对手买入：20–500 BB", "真人头像 · 独立牌风模拟")
+                    else listOf("Star cash table", "$bots random stars", "Your buy-in: $stackBB BB", "Opponents: 20–500 BB", "Real portraits · simulated styles")
+                TableType.MIXED -> allLines.dropLast(1)
+                else -> allLines
+            }
             Text(lines[0], color = Palette.Text, fontSize = 18.sp, fontWeight = FontWeight.Bold, lineHeight = 24.sp)
             for (l in lines.drop(1)) Text(l, color = Palette.Text.copy(alpha = 0.85f), fontSize = 13.sp, lineHeight = 19.sp)
             if (table == TableType.MIXED) {

@@ -46,6 +46,7 @@ data class SeatUi(
     val tag: String? = null,
     /** live HUD line for a bot, e.g. "入32 加18 · 24手" (null = HUD off) */
     val hud: String? = null,
+    val starId: String? = null,
 )
 
 /** GTO feedback on the hero's last decision. */
@@ -123,7 +124,7 @@ data class TableScreenUi(
 )
 
 /** Static info about a seat that lives outside a single hand. */
-data class SeatInfo(val seat: Int, val name: String, val isHero: Boolean, val stack: Int, val busted: Boolean, val hud: String? = null)
+data class SeatInfo(val seat: Int, val name: String, val isHero: Boolean, val stack: Int, val busted: Boolean, val hud: String? = null, val starId: String? = null)
 
 object TableMapper {
 
@@ -185,7 +186,7 @@ object TableMapper {
             val p = inHand[info.seat]
             if (p == null) {
                 SeatUi(info.seat, info.name, info.stack, 0, true, false, info.isHero, false, false,
-                    null, false, "", busted = true)
+                    null, false, "", busted = true, starId = info.starId)
             } else {
                 val won = res?.won?.get(p.seat) ?: 0
                 val returned = res?.uncalledReturned?.takeIf { it.first == p.seat }?.second ?: 0
@@ -211,7 +212,7 @@ object TableMapper {
                     actKind = a?.let { actKind(it) },
                     won = if (stage == Stage.FINAL) won - returned else 0,
                     handName = if (score != null && p.seat in showdown) HandEvaluator.categoryName(score, st.isZh) else null,
-                    hud = info.hud,
+                    hud = info.hud, starId = info.starId,
                 )
             }
         }

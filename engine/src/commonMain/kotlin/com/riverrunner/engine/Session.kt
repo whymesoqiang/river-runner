@@ -7,7 +7,7 @@ enum class GameMode(val code: String) { CASH("C"), TOURNAMENT("T");
     companion object { fun fromCode(c: String) = entries.first { it.code == c } }
 }
 
-enum class TableType { GTO, MIXED }
+enum class TableType { GTO, MIXED, STARS }
 
 data class SessionConfig(
     val mode: GameMode,
@@ -33,6 +33,7 @@ class SessionPlayer(
     val style: BotStyle,
     val isHuman: Boolean,
     var stack: Int,
+    val starId: String? = null,
 ) {
     val startStack = stack
     /** 0 while still playing, otherwise finishing place (1 = winner) */
@@ -78,6 +79,7 @@ class GameSession(val config: SessionConfig) {
 
     init {
         require(config.tableSize in 2..9)
+        require(config.tableType != TableType.STARS || config.mode == GameMode.CASH) { "Star tables use cash-game buy-ins" }
         val names = BOT_NAMES.shuffled(random)
         val start = config.startingBB * BASE_BB
         val bots = config.tableSize - 1
@@ -87,9 +89,14 @@ class GameSession(val config: SessionConfig) {
             mix == null -> List(bots) { MIXED_POOL[random.nextInt(MIXED_POOL.size)] }
             else -> mix.assign(bots, random)
         }
+        val stars = if (config.tableType == TableType.STARS) StarProfiles.all.shuffled(random).take(bots) else emptyList()
         players = List(config.tableSize) { i ->
             if (i == HERO_SEAT) SessionPlayer(i, "You", BotStyle.GTO, true, start)
-            else SessionPlayer(i, names[i - 1], botStyles[i - 1], false, start)
+            else if (stars.isNotEmpty()) {
+                val star = stars[i - 1]
+                SessionPlayer(i, star.name, star.baseStyle, false,
+                    random.nextInt(star.minBB, star.maxBB + 1) * BASE_BB, star.id)
+            } else SessionPlayer(i, names[i - 1], botStyles[i - 1], false, start)
         }
         buttonSeat = random.nextInt(config.tableSize)
     }
@@ -141,7 +148,8 @@ class GameSession(val config: SessionConfig) {
         for (b in busted) { players[b.seat].place = place; place-- }
         handNumber++
         val record = HandRecord.from(engine, config.mode, handNumber, HERO_SEAT, config.tableSize,
-            styles = players.associate { it.seat to it.style })
+            styles = players.associate { it.seat to it.style },
+            starIds = players.mapNotNull { p -> p.starId?.let { p.seat to it } }.toMap())
         current = null
         return record.copy(won = result.won)
     }
