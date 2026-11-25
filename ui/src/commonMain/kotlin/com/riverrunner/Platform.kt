@@ -11,6 +11,10 @@ import kotlin.math.floor
  * SharedPreferences, files and a SoundPool; the web app with localStorage and audio elements.
  */
 interface Platform {
+    suspend fun compute(request: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+        com.riverrunner.engine.ComputeProtocol.run(request)
+    }
+
     /** Small settings (the Android SharedPreferences file "river_runner"). */
     val settings: Settings
     /** Save slots and hand histories, stored as named text files. */

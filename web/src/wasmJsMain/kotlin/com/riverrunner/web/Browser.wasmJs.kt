@@ -14,3 +14,7 @@ internal actual fun storageSet(key: String, value: String): Boolean = jsStorageS
 internal actual fun storageRemove(key: String) = jsStorageRemove(key)
 internal actual fun browserLanguage(): String = jsLanguage()
 internal actual fun playAudio(url: String, volume: Double, rate: Double) = jsPlay(url, volume, rate)
+
+internal actual fun workerSubmit(id: Int, payload: String): Unit = js("window.rrCompute.submit(id, payload)")
+internal actual fun workerPoll(id: Int): String? = js("window.rrCompute.poll(id)")
+internal actual fun workerCancel(id: Int): Unit = js("window.rrCompute.cancel(id)")

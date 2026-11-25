@@ -8,6 +8,11 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.8
+- 网页将策略、复盘胜率及成就计算移到单一后台线程，切换复盘时取消过期任务。 | Run web calculations in one cancellable background worker.
+- 每手结束默认停在结算帧，展示公共牌、底池获胜者和净收益，保留操作记录入口。 | Open each hand review at settlement, with board, pot recipients, net results and action history.
+- 策略解答增加底牌与牌面、跟注价格算式、行动含义和新手术语说明。 | Explain saved cards, call prices, actions and terminology for beginners.
+
 ## 0.7 · 2026-11-22
 
 ### 新增 | Added

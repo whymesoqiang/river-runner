@@ -79,9 +79,9 @@ enum class LogKind { STREET, ACTION, RESULT }
 
 data class LogLine(val kind: LogKind, val text: String, val seat: Int = -1, val cards: List<Int> = emptyList())
 
-data class WinLine(val name: String, val amount: Int, val handName: String?)
+data class WinLine(val name: String, val amount: Int, val handName: String?, val net: Int = 0)
 data class ShowLine(val name: String, val cards: IntArray, val handName: String, val won: Int, val isHero: Boolean)
-data class HandOverUi(val winners: List<WinLine>, val showdown: List<ShowLine>, val heroNet: Int, val byFold: Boolean)
+data class HandOverUi(val winners: List<WinLine>, val showdown: List<ShowLine>, val heroNet: Int, val byFold: Boolean, val board: List<Int> = emptyList())
 
 data class PracticeInfo(
     val toCall: Int,
@@ -256,13 +256,13 @@ object TableMapper {
         val returned = res.uncalledReturned
         fun wonOf(s: Int) = (res.won[s] ?: 0) - (if (returned?.first == s) returned.second else 0)
         val winners = res.pots.flatMap { it.winners }.distinct().map { s ->
-            WinLine(names[s] ?: "?", wonOf(s), res.scores[s]?.let { HandEvaluator.categoryName(it, st.isZh) })
+            WinLine(names[s] ?: "?", wonOf(s), res.scores[s]?.let { HandEvaluator.categoryName(it, st.isZh) }, res.net[s] ?: 0)
         }
         val shows = res.showdown.map { s ->
             val p = e.player(s)
             ShowLine(names[s] ?: "?", p.hole, HandEvaluator.categoryName(res.scores.getValue(s), st.isZh), wonOf(s), s == heroSeat)
         }
-        return HandOverUi(winners, shows, res.net[heroSeat] ?: 0, res.showdown.isEmpty())
+        return HandOverUi(winners, shows, res.net[heroSeat] ?: 0, res.showdown.isEmpty(), e.board.toList())
     }
 
     /** Practice-mode description of the hero's holding: starting hand class preflop, made hand afterwards. */

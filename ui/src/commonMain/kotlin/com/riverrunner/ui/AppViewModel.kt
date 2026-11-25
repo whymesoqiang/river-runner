@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.riverrunner.audio.Sound
 import com.riverrunner.Fmt
 import com.riverrunner.IoDispatcher
+import com.riverrunner.engine.ComputeProtocol
 import com.riverrunner.Platform
 import com.riverrunner.engine.nowMillis
 import kotlin.math.roundToInt
@@ -391,7 +392,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
         } else null
     }
 
-    private suspend fun runGame(s: GameSession) {
+    private suspend fun runGame(s: GameSession) = kotlinx.coroutines.coroutineScope {
         while (!s.isOver && !quitRequested) {
             val e = s.startHand()
             handKey = kotlin.random.Random.nextLong()
@@ -418,11 +419,11 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                 notice = strings.blindsUpNotice(Fmt.grouped(prev.first) + "/" + Fmt.grouped(prev.second), Fmt.grouped(lvl.smallBlind) + "/" + Fmt.grouped(lvl.bigBlind))
                 sound.play(Sound.BLINDS, 0.8f, varyPitch = false)
                 val shown = notice
-                viewModelScope.launch { delay(4000); if (notice == shown) notice = null }
+                launch { delay(4000); if (notice == shown) notice = null }
             }
             lastBlinds = lvl.smallBlind to lvl.bigBlind
             publish(s, e, TableMapper.Stage.LIVE)
-            viewModelScope.launch {
+            launch {
                 repeat(e.order.size) { sfx(Sound.DEAL, 0.6f); delay(80) }
             }
             pause(1000) // cards being dealt
@@ -437,7 +438,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                         e.dealNextStreet()
                         if (hadBets) sfx(Sound.COLLECT, 0.6f)
                         val flips = if (e.street == Street.FLOP) 3 else 1
-                        viewModelScope.launch {
+                        launch {
                             for (i in 0 until flips) { delay(if (i == 0) 170L else 120L); sfx(Sound.FLIP, 0.8f) }
                         }
                         actionSeq++
@@ -468,12 +469,12 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             // until the policy is ready (it is awaited before the move is applied).
                             val ctx = s.tournamentContext()
                             val seed = handKey xor (actionSeq.toLong() shl 20)
-                            val policyJob = viewModelScope.async(Dispatchers.Default) {
-                                runCatching { Bot.decide(e, seat, BotStyle.GTO, kotlin.random.Random(seed), ctx) }.getOrNull()
+                            val policyJob = async(Dispatchers.Default) {
+                                ComputeProtocol.readPolicy(platform.compute(ComputeProtocol.policyRequest(e, seat, BotStyle.GTO, seed, ctx)))
                             }
                             val d = CompletableDeferred<Move>()
                             heroMove = d
-                            val adviceJob = viewModelScope.launch {
+                            val adviceJob = launch {
                                 val ready = policyJob.await()
                                 if (heroMove === d && !d.isCompleted) livePolicy = ready
                             }
@@ -485,7 +486,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             practiceInfo = null
                             val policy = policyJob.await()
                             val a = apply(e, s, move)
-                            if (policy != null && !quitRequested) {
+                            if (!quitRequested) {
                                 val v = Deviation.judge(policy, a)
                                 handVerdicts += a.street to v
                                 feedback = DecisionFeedback(policy, a, v)
@@ -500,7 +501,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             val style = s.players[seat].style
                             val ctx = s.tournamentContext()
                             val move = withContext(Dispatchers.Default) {
-                                Bot.decide(e, seat, style, s.random, ctx, com.riverrunner.engine.StarProfiles.byId(s.players[seat].starId)).sample(s.random)
+                                ComputeProtocol.readPolicy(platform.compute(ComputeProtocol.policyRequest(e, seat, style, s.random.nextLong(), ctx, s.players[seat].starId))).sample(s.random)
                             }
                             pause(think - (nowMillis() - started))
                             apply(e, s, move)
@@ -530,7 +531,11 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                 for ((street, v) in handVerdicts) tally = tally.add(street, pos, v)
                 handVerdicts.clear()
             }
-            record(withContext(Dispatchers.Default) { runCatching { Facts.forHand(rec) }.getOrDefault(emptyMap()) })
+            launch {
+                try { record(ComputeProtocol.readFacts(platform.compute(ComputeProtocol.factsRequest(rec)))) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (_: Exception) { /* Optional achievements must not prevent settlement. */ }
+            }
             if (rec.favorite) record(mapOf(Progress.STARS to 1L))
             val bb = e.bigBlind
             val betsOut = e.players.any { it.streetBet > 0 }

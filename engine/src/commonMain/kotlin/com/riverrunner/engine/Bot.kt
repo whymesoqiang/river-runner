@@ -44,6 +44,9 @@ class TournamentContext(
 
 data class PolicyReason(val zh: String, val en: String)
 
+data class PolicyContext(val hole: List<Int>, val board: List<Int>, val bigBlind: Int,
+    val toCall: Int, val stack: Int, val streetBet: Int)
+
 /** A mixed strategy over legal moves. */
 class Policy(
     val options: List<Pair<Move, Double>>,
@@ -57,6 +60,7 @@ class Policy(
     val pot: Int = 0,
     val reasons: List<PolicyReason> = emptyList(),
     val summary: PolicyReason? = null,
+    val context: PolicyContext? = null,
 ) {
     fun sample(random: Random): Move {
         var r = random.nextDouble()
@@ -337,7 +341,9 @@ object Bot {
         val traits = personality?.traits ?: BotTraits.from(style)
         val p = if (engine.street == Street.PREFLOP) preflop(engine, seat, traits, la, random, tournament)
         else postflop(engine, seat, traits, la, random, tournament)
-        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons, p.summary)
+        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons, p.summary,
+            PolicyContext(engine.player(seat).hole.toList(), engine.board.toList(), engine.bigBlind,
+                la.toCall, engine.player(seat).stack, la.myStreetBet))
     }
 
     /**

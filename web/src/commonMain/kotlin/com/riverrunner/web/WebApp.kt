@@ -36,6 +36,21 @@ import org.jetbrains.compose.resources.Font
 import kotlin.random.Random
 
 // Browser pieces, implemented separately for the JS and the Wasm build (see Browser.*.kt).
+internal expect fun workerSubmit(id: Int, payload: String)
+internal expect fun workerPoll(id: Int): String?
+internal expect fun workerCancel(id: Int)
+private var computeId = 0
+private suspend fun backgroundCompute(payload: String): String {
+    val id = ++computeId
+    workerSubmit(id, payload)
+    try {
+        while (true) {
+            workerPoll(id)?.let { return it }
+            kotlinx.coroutines.delay(20)
+        }
+    } finally { workerCancel(id) }
+}
+
 internal expect fun storageGet(key: String): String?
 /** False when the browser refused (storage full or blocked). */
 internal expect fun storageSet(key: String, value: String): Boolean
@@ -96,6 +111,7 @@ private const val PORTRAIT_STRIP = 9f / 16f
 private const val PREFIX = "rr."
 
 internal object WebPlatform : Platform {
+    override suspend fun compute(request: String): String = backgroundCompute(request)
     override val settings: Settings = StorageSettings
     override val files: TextFiles = StorageFiles
     override val sound: SoundOut = AudioSound

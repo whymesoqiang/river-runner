@@ -83,6 +83,16 @@ kotlin {
     }
 }
 
+tasks.matching { it.name == "composeCompatibilityBrowserDistribution" }.configureEach {
+    dependsOn(":worker:jsBrowserDistribution")
+    doLast {
+        copy {
+            from(project(":worker").layout.buildDirectory.dir("dist/js/productionExecutable"))
+            into(layout.buildDirectory.dir("dist/composeWebCompatibility/productionExecutable"))
+        }
+    }
+}
+
 compose.resources {
     packageOfResClass = "com.riverrunner.web.res"
 }

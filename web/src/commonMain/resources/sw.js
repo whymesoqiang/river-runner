@@ -23,6 +23,8 @@ function pageKey(request) {
 self.addEventListener("install", (event) => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE);
+        // Needed even if the first hand is started after the device goes offline.
+        await cache.addAll(["compute-worker.js", "strategyWorker.js"]);
         // Carry over what the previous version had: fingerprinted files are copied,
         // the rest are downloaded fresh. Files new in this version are cached on first use.
         for (const name of await caches.keys()) {

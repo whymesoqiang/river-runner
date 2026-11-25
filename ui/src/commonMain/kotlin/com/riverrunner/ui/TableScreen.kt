@@ -431,7 +431,7 @@ private fun logSuitColor(card: Int) = when (Cards.suit(card)) {
 }
 
 @Composable
-private fun HandOverPanel(over: HandOverUi, fmt: (Int) -> String) {
+internal fun HandOverPanel(over: HandOverUi, fmt: (Int) -> String) {
     val st = LocalStrings.current
     Column(
         Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(Palette.Bg).padding(8.dp)
@@ -439,7 +439,7 @@ private fun HandOverPanel(over: HandOverUi, fmt: (Int) -> String) {
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(st.handResult, color = Palette.Text, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(if (st.isZh) "结算 · 你的净收益" else "Result · your net", color = Palette.Text, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             val net = over.heroNet
             Text(
                 (if (net > 0) "+" else if (net < 0) "−" else "") + fmt(kotlin.math.abs(net)),
@@ -447,8 +447,15 @@ private fun HandOverPanel(over: HandOverUi, fmt: (Int) -> String) {
                 fontSize = 17.sp, fontFamily = Numeric, fontWeight = FontWeight.SemiBold,
             )
         }
+        Text(if (st.isZh) "本手公共牌" else "Community cards", color = Palette.TextDim, fontSize = 11.sp)
+        if (over.board.isEmpty()) Text(if (st.isZh) "未发公共牌：翻牌前已结束" else "Ended before the flop", color = Palette.Text, fontSize = 12.sp)
+        else Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            over.board.forEach { PlayingCard(it, 25.dp) }
+        }
         for (w in over.winners) {
-            Text("🏆 ${st.winsFor(w.name)} ${fmt(w.amount)}", color = Palette.Text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Text(if (st.isZh) "${w.name} · 收下底池 ${fmt(w.amount)}" else "${w.name} · collected ${fmt(w.amount)}", color = Palette.Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text((if (st.isZh) "本手净收益 " else "Hand net ") + (if (w.net > 0) "+" else if (w.net < 0) "−" else "") + fmt(kotlin.math.abs(w.net)) +
+                (w.handName?.let { " · $it" } ?: ""), color = Palette.Text, fontSize = 12.sp)
         }
         if (over.byFold) Text(st.othersFolded, color = Palette.TextDim, fontSize = 11.sp)
         if (over.showdown.isNotEmpty()) {

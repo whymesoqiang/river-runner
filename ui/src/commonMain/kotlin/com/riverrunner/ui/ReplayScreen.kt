@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riverrunner.engine.Action
 import com.riverrunner.engine.ActionType
+import com.riverrunner.engine.ComputeProtocol
 import com.riverrunner.engine.Bot
 import com.riverrunner.engine.BotStyle
 import com.riverrunner.engine.Cards
@@ -65,6 +66,8 @@ fun ReplayScreen(vm: AppViewModel, initial: HandRecord) {
     val st = LocalStrings.current
     ReplayContent(
         record = record,
+        startIndex = if (vm.reviewing) Int.MAX_VALUE else 0,
+        compute = vm.platform::compute,
         fmt = { vm.fmt(it, record.bigBlind) },
         onBack = leave,
         onStar = { vm.toggleFavorite(record.id)?.let { record = it } },
@@ -105,12 +108,18 @@ fun replayTable(st: Strings, record: HandRecord, frames: List<ReplayFrame>, idx:
     var highlight = emptySet<Int>()
     var banner: String? = null
     if (frame.isEnd) {
-        val winners = frame.players.filter { it.stack > it.startStack }
+        val result = Replayer(record).engineBeforeAction(record.actions.count { !it.type.isPost }).result!!
+        val recipients = result.pots.flatMap { it.winners }.toSet()
+        val winners = frame.players.filter { it.seat in recipients }
         if (atShowdown && winners.isNotEmpty()) {
             val w = winners.maxBy { it.stack - it.startStack }
             highlight = HandEvaluator.bestFive((frame.board + w.hole.toList()).toIntArray()).toSet()
         }
-        banner = winners.joinToString(" / ") { "${st.winsFor(names.getValue(it.seat))} ${fmt(it.stack - it.startStack)}" }
+        banner = winners.joinToString(" / ") {
+            val net = it.stack - it.startStack
+            "${names.getValue(it.seat)} · " + (if (st.isZh) "净收益 " else "net ") +
+                (if (net > 0) "+" else if (net < 0) "−" else "") + fmt(kotlin.math.abs(net))
+        }
             .ifEmpty { null }
     }
     val seats = frame.players.sortedBy { it.seat }.map { p ->
@@ -157,12 +166,21 @@ fun ReplayContent(
     onContinue: (() -> Unit)? = null,
     /** label of the [onContinue] button; defaults to "Next hand" */
     continueLabel: String? = null,
+    compute: suspend (String) -> String = { withContext(Dispatchers.Default) { ComputeProtocol.run(it) } },
 ) {
     val st = LocalStrings.current
     val replayer = remember(record.id) { Replayer(record) }
     val frames = replayer.frames
     var idx by remember(record.id) { mutableIntStateOf(startIndex.coerceIn(0, frames.size - 1)) }
     val frame = frames[idx]
+    val settlement = remember(record.id, st) {
+        val end = replayer.engineBeforeAction(record.actions.count { !it.type.isPost })
+        TableMapper.handOver(st, end, record.players.map {
+            SeatInfo(it.seat, if (it.seat == record.heroSeat) st.you else com.riverrunner.engine.StarProfiles.byId(it.starId)?.display(st.isZh)?.substringBefore(" ·") ?: it.name,
+                it.seat == record.heroSeat, it.startStack, false)
+        }, record.heroSeat)
+    }
+    var showResult by remember(record.id, frame.isEnd) { mutableStateOf(true) }
 
     // exact equity for the players still in, cached per street
     val equityCache = remember(record.id) { mutableStateMapOf<String, Map<Int, Double>>() }
@@ -173,7 +191,7 @@ fun ReplayContent(
             // Debounce rapid navigation; don't calculate frames the user has already left.
             kotlinx.coroutines.delay(150)
             val eq = withContext(Dispatchers.Default) {
-                Equity.showdown(live.map { it.hole }, frame.board, Random(record.id), 30000)
+                ComputeProtocol.readEquity(compute(ComputeProtocol.equityRequest(live.map { it.hole }, frame.board, record.id, 30000)))
             }
             equityCache[eqKey] = live.mapIndexed { i, p -> p.seat to eq[i] }.toMap()
         }
@@ -182,6 +200,7 @@ fun ReplayContent(
     // hero decision on this frame (just taken, or about to be taken)
     val actionsSoFar = frames.take(idx + 1).count { it.action != null }
     val decisionIndex = when {
+        frame.isEnd -> -1
         frame.action?.seat == record.heroSeat -> actionsSoFar - 1
         frame.toAct == record.heroSeat && !frame.isEnd -> actionsSoFar
         else -> -1
@@ -194,8 +213,7 @@ fun ReplayContent(
             kotlinx.coroutines.delay(150)
             val p = withContext(Dispatchers.Default) {
                 runCatching {
-                    val e = replayer.engineBeforeAction(decisionIndex)
-                    Bot.decide(e, record.heroSeat, BotStyle.GTO, Random(record.id + decisionIndex), record.tournamentContext())
+                    ComputeProtocol.readPolicy(compute(ComputeProtocol.policyRequest(record, decisionIndex, record.heroSeat, BotStyle.GTO, record.id + decisionIndex, record.tournamentContext())))
                 }.getOrNull()
             }
             if (p != null) policyCache[decisionIndex] = p
@@ -226,8 +244,17 @@ fun ReplayContent(
                     }
                     SmallButton(if (record.favorite) "★" else "☆", onStar, highlight = record.favorite)
                 }
-                if (heroAction != null) AnalysisCard(heroAction, frame.action?.seat == record.heroSeat, policy, fmt)
-                HistoryPanel(log, Modifier.weight(1f), highlightIndex = idx, onClick = { idx = it })
+                if (frame.isEnd) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        SmallButton(if (st.isZh) "结算" else "Result", { showResult = true }, highlight = showResult)
+                        SmallButton(if (st.isZh) "操作记录" else "Actions", { showResult = false }, highlight = !showResult)
+                    }
+                }
+                if (frame.isEnd && showResult) Box(Modifier.weight(1f)) { HandOverPanel(settlement, fmt) }
+                else {
+                    if (heroAction != null) AnalysisCard(heroAction, frame.action?.seat == record.heroSeat, policy, fmt)
+                    HistoryPanel(log, Modifier.weight(1f), highlightIndex = idx, onClick = { idx = it })
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                     SmallButton("⏮", { idx = 0 }, Modifier.weight(1f))
                     SmallButton("◀", { if (idx > 0) idx-- }, Modifier.weight(1f))
