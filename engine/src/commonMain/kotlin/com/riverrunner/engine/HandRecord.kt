@@ -38,6 +38,10 @@ data class HandRecord(
         return (won[heroSeat] ?: 0) - committed
     }
 
+    /** Rebuild the same single-table tournament context used during live play. */
+    fun tournamentContext(): TournamentContext? = if (mode == GameMode.TOURNAMENT)
+        TournamentContext(players.associate { it.seat to it.startStack }, Icm.payoutsFor(tableSize)) else null
+
     fun encode(): String {
         val sb = StringBuilder()
         sb.append("H1|").append(id).append('|').append(time).append('|').append(mode.code).append('|')

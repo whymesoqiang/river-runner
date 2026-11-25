@@ -33,11 +33,12 @@
                   font: 17px -apple-system, "PingFang SC", sans-serif; padding: 24px; box-sizing: border-box; }
         #rotate small { color: #9DAAA2; font-size: 13px; line-height: 1.6; }
         #rotate .phone { width: 46px; height: 78px; border: 3px solid #E6B54F; border-radius: 9px;
-                         animation: rr-turn 2.4s ease-in-out infinite; }
+                         animation: rr-turn 2.4s ease-in-out 3 forwards; }
         @keyframes rr-turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
         /* shown only when turning the phone would help: a portrait window that fills the screen
            (not split view on an unfolded phone or iPad, not a narrow desktop window; see fit()) */
         html.rr-rotate #rotate { display: flex; }
+        html.rr-rotate #loading { display: none; }
     </style>
     <script>
         // Loading diagnostics: elapsed time, files being fetched, and any error, shown on the
@@ -210,57 +211,7 @@
 <body>
     <div id="app"></div>
     <div id="safe" style="position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)"></div>
-    <script>
-        // Keep the app exactly inside the part of the screen you can see. Safari's toolbars come
-        // and go, and the page can be scrolled or zoomed by a stray gesture; the visual viewport
-        // is the visible rectangle, so the app follows it, and scroll and zoom are put back.
-        (function () {
-            var app = document.getElementById("app");
-            var vv = window.visualViewport;
-            function fit() {
-                if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
-                if (vv && vv.scale > 1.01) {
-                    // a zoom slipped through: setting the viewport again resets it
-                    var m = document.querySelector('meta[name="viewport"]');
-                    m.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no");
-                    setTimeout(function () { m.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"); }, 50);
-                }
-                // From the home screen the whole screen is ours; in a Safari tab, the part between its toolbars.
-                var standalone = navigator.standalone === true ||
-                    (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
-                var x = 0, y = 0, w = window.innerWidth, h = window.innerHeight;
-                if (!standalone && vv) { x = vv.offsetLeft; y = vv.offsetTop; w = vv.width; h = vv.height; }
-                // The page covers the whole screen (viewport-fit=cover). iOS reserves wide margins for
-                // the notch / Dynamic Island and the home indicator; the app only keeps clear of what
-                // would really cover it: up to 50 px on the side with the camera (the island ends
-                // about 48 px from the edge), the top in portrait, and nothing for the home indicator,
-                // which is a thin line drawn over the app.
-                var cs = getComputedStyle(document.getElementById("safe"));
-                var inset = function (side) { return parseFloat(cs["padding" + side]) || 0; };
-                var l = Math.min(inset("Left"), 50), r = Math.min(inset("Right"), 50), t = inset("Top");
-                app.style.left = Math.round(x + l) + "px";
-                app.style.top = Math.round(y + t) + "px";
-                app.style.width = Math.max(0, Math.round(w - l - r)) + "px";
-                app.style.height = Math.max(0, Math.round(h - t)) + "px";
-                // Ask to turn the phone only when the window is portrait and fills (nearly) the
-                // whole screen. In split view a tall narrow window is normal and turning the device
-                // does not change it, so the app is shown as a landscape strip instead (WebApp.kt).
-                var sShort = Math.min(screen.width, screen.height), sLong = Math.max(screen.width, screen.height);
-                var fullScreen = window.innerWidth >= sShort * 0.9 && window.innerHeight >= sLong * 0.7;
-                var touch = navigator.maxTouchPoints > 0;
-                document.documentElement.classList.toggle("rr-rotate", touch && fullScreen && window.innerHeight > window.innerWidth);
-            }
-            if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); }
-            window.addEventListener("resize", fit);
-            window.addEventListener("orientationchange", function () { fit(); setTimeout(fit, 300); setTimeout(fit, 800); });
-            // Safari's own pinch and double-tap zoom
-            ["gesturestart", "gesturechange", "gestureend"].forEach(function (t) {
-                document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false });
-            });
-            document.addEventListener("dblclick", function (e) { e.preventDefault(); }, { passive: false });
-            fit();
-        })();
-    </script>
+    <script src="viewport.js"></script>
     <div id="rotate">
         <div class="phone"></div>
         <div>请把手机横过来使用</div>

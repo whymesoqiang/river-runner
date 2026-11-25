@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   build:
+    # Forks deploy the web app without the upstream Android signing secrets.
+    if: github.repository == 'shunzhe1121/river-runner' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
       VERSION_CODE: ${{ github.run_number }}
@@ -177,7 +179,7 @@ jobs:
     # Renders the UI on the JVM (Robolectric + Roborazzi) and publishes the PNGs to the
     # "screenshots" branch, so layout changes can be reviewed without a device.
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.repository == 'shunzhe1121/river-runner'
     steps:
       - uses: actions/checkout@v4
 

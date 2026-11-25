@@ -42,6 +42,8 @@ class TournamentContext(
     val payouts: DoubleArray,
 )
 
+data class PolicyReason(val zh: String, val en: String)
+
 /** A mixed strategy over legal moves. */
 class Policy(
     val options: List<Pair<Move, Double>>,
@@ -53,6 +55,7 @@ class Policy(
     val icmRequired: Double?,
     /** pot when the decision was made, used to classify bet sizes */
     val pot: Int = 0,
+    val reasons: List<PolicyReason> = emptyList(),
 ) {
     fun sample(random: Random): Move {
         var r = random.nextDouble()
@@ -209,7 +212,8 @@ object Bot {
                 else -> return 2
             }
         }
-        return if (board.size < 5 && drawOuts(hole, board) >= 8) 1 else if (board.size < 5 && drawOuts(hole, board) >= 4 && h0 >= 9 && h1 >= 9) 1 else 0
+        val outs = if (board.size < 5) drawOuts(hole, board) else 0
+        return if (outs >= 8 || (outs >= 4 && h0 >= 9 && h1 >= 9)) 1 else 0
     }
 
     /** Rough count of outs to a flush or straight (only draws using a hole card). */
@@ -276,6 +280,9 @@ object Bot {
             val prev = streetActions[a.street]
             if (prev == null || a.type.isAggressive || (prev == ActionType.CHECK && a.type == ActionType.CALL)) streetActions[a.street] = a.type
         }
+        val prefixes = streetActions.map { (street, action) -> board.take(street.boardCount) to action }
+        // Decision-local, bounded cache: no stale board/action state and no hidden-card access.
+        val weights = if (prefixes.isEmpty()) DoubleArray(0) else DoubleArray(52 * 52) { -1.0 }
         return Equity.HandSampler { dead, random ->
             var lastMask = 0L
             for (attempt in 0 until 25) {
@@ -286,12 +293,15 @@ object Bot {
                 val mask = (1L shl c1) or (1L shl c2)
                 lastMask = mask
                 if (streetActions.isEmpty()) return@HandSampler mask
-                var w = 1.0
-                val hole = intArrayOf(c1, c2)
-                for ((st, act) in streetActions) {
-                    val prefix = board.take(st.boardCount)
-                    if (prefix.size < 3) continue
-                    w *= weightFor(handClass(hole, prefix), act)
+                val key = min(c1, c2) * 52 + max(c1, c2)
+                var w = weights[key]
+                if (w < 0.0) {
+                    w = 1.0
+                    val hole = intArrayOf(c1, c2)
+                    for ((prefix, act) in prefixes) {
+                        if (prefix.size >= 3) w *= weightFor(handClass(hole, prefix), act)
+                    }
+                    weights[key] = w
                 }
                 if (random.nextDouble() < w) return@HandSampler mask
             }
@@ -324,7 +334,7 @@ object Bot {
         require(la.seat == seat)
         val p = if (engine.street == Street.PREFLOP) preflop(engine, seat, style, la, random, tournament)
         else postflop(engine, seat, style, la, random, tournament)
-        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot)
+        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons)
     }
 
     /**
@@ -422,6 +432,9 @@ object Bot {
         return max(req, potOdds) to req
     }
 
+    private fun pctText(value: Double) = "${kotlin.math.round(value * 1000) / 10}%"
+    private fun number(value: Double) = "${kotlin.math.round(value * 100) / 100}"
+
     private fun preflop(engine: HandEngine, seat: Int, style: BotStyle, la: LegalActions, random: Random, t: TournamentContext?): Policy {
         val me = engine.player(seat)
         val bb = engine.bigBlind
@@ -437,6 +450,11 @@ object Bot {
         val ranges = preflopRanges(engine)
         val iWasRaiser = acts.any { it.seat == seat && it.type.isAggressive }
 
+        val reasons = mutableListOf(PolicyReason(
+            "起手牌 ${HandClasses.className(me.hole[0], me.hole[1])} 在引擎排序中位于前 ${pctText(pct)}（不是胜率）；后面还有 $behind 人，有效筹码 ${number(effBB)} BB。",
+            "${HandClasses.className(me.hole[0], me.hole[1])} ranks in the top ${pctText(pct)} of this engine's hand ordering (not equity); $behind players remain behind, effective stack ${number(effBB)} BB."
+        ))
+        fun explain(zh: String, en: String) { reasons += PolicyReason(zh, en) }
         // ---- big calls (facing a shove or a raise that commits a large part of the stack)
         if (la.toCall > 0 && (la.toCall >= me.stack * 0.4 || engine.players.any { it.allIn && !it.folded && it.seat != seat && it.streetBet >= la.currentBet })) {
             val opps = engine.players.filter { !it.folded && it.seat != seat }
@@ -449,7 +467,11 @@ object Bot {
             if (canJam) opts += Move.raiseTo(la.maxRaiseTo) to pCall
             else opts += Move.CALL to pCall
             opts += Move.FOLD to (1 - pCall)
-            return Policy(normalized(opts), eq, la.toCall.toDouble() / (la.pot + la.toCall), icm)
+            explain("面对大额跟注：对公开行动推测范围的模拟胜率 ${pctText(eq)}，策略使用的跟注门槛 ${pctText(req)}。调整后胜率与门槛差 ${pctText(margin)}；越高越倾向继续，接近门槛时混合行动。",
+                "Facing a large call: simulated range equity ${pctText(eq)}, calling threshold ${pctText(req)}. Adjusted equity minus threshold is ${pctText(margin)}; a larger margin favors continuing, with mixed actions near the threshold.")
+            if (icm != null) explain("此处计入 ICM 奖金权益；门槛取 ICM 与底池赔率中的较高值。", "ICM prize equity applies here; the threshold is the larger of ICM and pot odds.")
+            if (canJam) explain("手牌进入再推范围且允许加注，继续部分改为全下。", "This hand qualifies for the re-shove range and raising is legal, so the continuing portion shoves.")
+            return Policy(normalized(opts), eq, la.toCall.toDouble() / (la.pot + la.toCall), icm, reasons = reasons)
         }
 
         if (raises == 0) {
@@ -458,21 +480,24 @@ object Bot {
             if (la.canCheck) {
                 // big blind option after limps / folds
                 val thr = 0.12 * style.looseness * style.aggression
+                explain("可以免费过牌；加注范围中心为前 ${pctText(thr)}，弱牌更多过牌，边缘牌混合。隔离尺度随跛入人数增加。", "Checking is free; the raise-range midpoint is top ${pctText(thr)}. Weaker hands check more, borderline hands mix; isolation sizing grows with limpers.")
                 val pR = smooth(pct, thr, 0.02)
                 val size = bb * (3 + limpers)
                 if (la.canRaise) opts += raiseMove(la, size) to pR
                 opts += Move.CHECK to (1 - pR)
-                return Policy(normalized(opts), null, 0.0, null)
+                return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
             }
             if (effBB <= 13 && t != null || effBB <= 10) {
                 val w = pushWidth(effBB, behind) * (if (hu) 1.07 else 1.0) * style.looseness
+                explain("短筹码推/弃分支：推牌范围中心为前 ${pctText(w)}，由有效筹码、后位人数与风格调整；边缘牌混合全下和弃牌。", "Short-stack push/fold: shove-range midpoint top ${pctText(w)}, adjusted for stack depth, players behind and style; marginal hands mix shoves and folds.")
                 val pJam = smooth(pct, w, 0.012)
                 opts += Move.raiseTo(la.maxRaiseTo) to pJam
                 opts += Move.FOLD to (1 - pJam)
-                return Policy(normalized(opts), null, 0.0, null)
+                return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
             }
             var thr = rfiWidth(behind, hu) * style.looseness
             if (limpers > 0) thr *= 0.65
+            explain("无人加注时，开池范围中心为前 ${pctText(thr)}；位置越靠后通常范围越宽，有跛入时收紧。起手牌越强于该门槛，加注频率越高。", "Unraised pot: opening-range midpoint top ${pctText(thr)}. Later positions usually open wider; limpers tighten the range. Hands stronger than the midpoint raise more often.")
             val pRaise = smooth(pct, thr, 0.02)
             val openBB = when {
                 hu -> 2.5
@@ -492,7 +517,7 @@ object Bot {
             } else {
                 opts += Move.FOLD to (1 - pRaise)
             }
-            return Policy(normalized(opts), null, 0.0, null)
+            return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
         }
 
         val potOdds = la.toCall.toDouble() / (la.pot + la.toCall)
@@ -504,6 +529,7 @@ object Bot {
         val ip = engine.order.indexOf(seat) > engine.order.indexOf(lastRaise.seat)
         val callersAfterRaise = acts.dropWhile { it !== lastRaise }.count { it.type == ActionType.CALL }
 
+        explain("已出现 $raises 次加注；最近加注者范围估为前 ${pctText(raiserWidth)}，跟注底池赔率为 ${pctText(potOdds)}。根据位置、加注层级和后续跟注人数调整再加注与跟注范围。", "There have been $raises raises; the last raiser's range is estimated as top ${pctText(raiserWidth)}, with pot odds ${pctText(potOdds)}. Position, raise level and intervening callers adjust the re-raise and calling ranges.")
         when (raises) {
             1 -> {
                 var threeBet = max(0.022, raiserWidth * 0.30) * style.aggression
@@ -517,6 +543,7 @@ object Bot {
                 if (callersAfterRaise > 0) { callTop *= 0.8; threeBet *= 1.1 }
                 if (!ip && !isBB) callTop *= 0.85
                 callTop = callTop.coerceIn(threeBet, 0.85)
+                explain("价值 3-bet 范围中心为前 ${pctText(threeBet)}，跟注范围上界中心为前 ${pctText(callTop)}；部分同花边缘牌和同花小 A 会加入诈唬加注。", "Value 3-bet midpoint top ${pctText(threeBet)}, call-range cutoff midpoint top ${pctText(callTop)}; some marginal suited hands and suited wheel aces add bluff raises.")
                 val pValue = smooth(pct, threeBet, 0.008)
                 var pBluff = 0.0
                 if (pct > callTop && pct < callTop + 0.09 && (isSuited(me.hole))) pBluff = 0.35 * style.bluff
@@ -539,6 +566,7 @@ object Bot {
                     fourBet = 0.02 * style.aggression
                     callTop = 0.04 * style.preflopCall
                 }
+                explain("价值 4-bet 范围中心为前 ${pctText(fourBet)}，跟注范围中心为前 ${pctText(callTop)}；是否为原加注者影响防守范围。", "Value 4-bet midpoint top ${pctText(fourBet)}, calling midpoint top ${pctText(callTop)}; being the original raiser changes the defense range.")
                 val pValue = smooth(pct, fourBet, 0.006)
                 val pBluff = if (iWasRaiser && isSuitedWheelAce(me.hole)) 0.3 * style.bluff else 0.0
                 val p4 = (pValue + (1 - pValue) * pBluff).coerceAtMost(1.0)
@@ -550,6 +578,7 @@ object Bot {
             }
             else -> {
                 val jam = 0.022 * style.aggression
+                explain("多次再加注后使用窄范围：全下范围中心为前 ${pctText(jam)}，跟注范围中心为前 ${pctText(0.045 * style.preflopCall)}。", "After repeated raises, use narrow ranges: shove midpoint top ${pctText(jam)}, call midpoint top ${pctText(0.045 * style.preflopCall)}.")
                 val pJam = smooth(pct, jam, 0.005)
                 val pCall = smooth(pct, 0.045 * style.preflopCall, 0.008) * (1 - pJam)
                 if (la.canRaise) opts += Move.raiseTo(la.maxRaiseTo) to pJam else opts += Move.CALL to pJam
@@ -557,7 +586,7 @@ object Bot {
                 opts += Move.FOLD to (1 - pJam - pCall).coerceAtLeast(0.0)
             }
         }
-        return Policy(normalized(opts), null, potOdds, null)
+        return Policy(normalized(opts), null, potOdds, null, reasons = reasons)
     }
 
     private fun postflop(engine: HandEngine, seat: Int, style: BotStyle, la: LegalActions, random: Random, t: TournamentContext?): Policy {
@@ -582,11 +611,23 @@ object Bot {
         val initiative = prevAggressor == seat
         val opts = ArrayList<Pair<Move, Double>>()
         val multi = if (nOpp >= 2) 0.35 else 1.0
+        val reasons = mutableListOf(PolicyReason(
+            "面对 $nOpp 名对手，按公开行动估计范围，模拟胜率 ${pctText(eq)}；相对均分底池份额为 ${number(rel)} 倍。SPR ${number(spr)}，${if (ip) "有位置" else "无位置"}，牌面湿度 ${number(wet)}（越高听牌越多）。",
+            "Against $nOpp opponents' ranges inferred from public actions, simulated equity is ${pctText(eq)} (${number(rel)} times an equal pot share). SPR ${number(spr)}, ${if (ip) "in position" else "out of position"}, board wetness ${number(wet)} (higher means more draws)."
+        ))
+        fun explain(zh: String, en: String) { reasons += PolicyReason(zh, en) }
 
+        explain("引擎牌力分类：${listOf("空气牌", "听牌", "弱成牌", "强一对", "两对或更强")[cls]}；${if (initiative) "持有" else "没有"}前街主动权。", "Engine hand class: ${listOf("air", "draw", "weak made hand", "strong one-pair", "two-pair or better")[cls]}; ${if (initiative) "has" else "does not have"} prior-street initiative.")
         if (la.toCall == 0) {
             // ---------------- we can check or bet
-            if (!la.canRaise) return Policy(listOf(Move.CHECK to 1.0), eq, 0.0, null)
+            if (!la.canRaise) {
+                explain("无需跟注且不能加注，合法行动为过牌。", "No call is required and raising is unavailable; check is the legal action.")
+                return Policy(listOf(Move.CHECK to 1.0), eq, 0.0, null, reasons = reasons)
+            }
             val valueThr = when (street) { Street.FLOP -> 1.22; Street.TURN -> 1.3; else -> 1.4 }
+            explain("价值下注参考门槛为均分份额的 ${number(valueThr)} 倍；当前${if (rel >= valueThr) "高于" else "低于"}门槛。低于门槛时，听牌、前街主动权和位置决定诈唬频率；多人底池降低诈唬频率，中等成牌偏向控池。",
+                "Value-bet reference is ${number(valueThr)} times an equal share; current equity is ${if (rel >= valueThr) "above" else "below"} it. Below it, draws, prior initiative and position set bluff frequency; multiway pots reduce bluffing and medium hands favor pot control.")
+            explain("价值下注在湿润牌面偏大、诈唬偏小；低 SPR 且价值足够时直接全下。多个尺寸按概率混合，并受最小加注和剩余筹码限制。", "Value sizes lean larger on wet boards, bluff sizes smaller. Low SPR with enough value shoves; sizes mix probabilistically and are constrained by legal raises and remaining chips.")
             var pBet = above(rel, valueThr, 0.06) * min(1.0, 0.85 * style.aggression + 0.1)
             if (cls == 4 && street == Street.FLOP && wet < 0.3 && nOpp == 1) pBet *= 0.7 // some slow-playing
             val pValue = pBet
@@ -618,7 +659,7 @@ object Bot {
                 }
             }
             opts += Move.CHECK to (1 - pBet)
-            return Policy(normalized(opts), eq, 0.0, null)
+            return Policy(normalized(opts), eq, 0.0, null, reasons = reasons)
         }
 
         // ---------------- facing a bet
@@ -627,7 +668,13 @@ object Bot {
         val realization = if (ip) 1.0 else 0.9
         val implied = if (cls == 1 && street != Street.RIVER && spr > 1.5) 0.05 else 0.0
         val eqEff = eq * realization + implied + style.callBias
+        explain("跟注需投入 ${la.toCall}，当前底池 $pot，底池赔率 ${pctText(potOdds)}。策略门槛 ${pctText(req)}；位置实现率 ${pctText(realization)}，听牌隐含收益修正 ${pctText(implied)}，调整后胜率 ${pctText(eqEff)}。高于门槛更倾向继续，接近门槛时混合。",
+            "Calling costs ${la.toCall} into pot $pot: pot odds ${pctText(potOdds)}, policy threshold ${pctText(req)}. Position realization ${pctText(realization)}, draw implied-equity adjustment ${pctText(implied)}, adjusted equity ${pctText(eqEff)}. Above the threshold favors continuing; near it the strategy mixes.")
+        if (icm != null) explain("此处应用 ICM 奖金权益门槛，且不低于底池赔率。", "An ICM prize-equity threshold applies here, floored at pot odds.")
+        if (potOdds < 0.22 && cls >= 2) explain("面对小注且有成牌，最小防守保护将加注前的跟注倾向至少提高到 85%。", "A made hand facing a small bet triggers a defense guard: the call propensity before allocating raises is at least 85%.")
+        explain("加注结合相对胜率与价值门槛，部分听牌加入半诈唬；多人底池减少诈唬，低 SPR 优先全下，否则混合加注尺寸。", "Raises combine relative equity and a value threshold, with some draws as semi-bluffs. Multiway pots reduce bluffs; low SPR favors shoving, otherwise raise sizes mix.")
         val raiseThr = when (street) { Street.FLOP -> 1.45; Street.TURN -> 1.52; else -> 1.6 }
+        explain("价值加注参考门槛为均分份额的 ${number(raiseThr)} 倍；当前相对胜率 ${number(rel)} 倍。", "Value-raise reference is ${number(raiseThr)} times an equal share; current relative equity is ${number(rel)}.")
         var pRaise = 0.0
         var pValueRaise = 0.0
         if (la.canRaise) {
@@ -662,6 +709,6 @@ object Bot {
         }
         opts += Move.CALL to pCall
         opts += Move.FOLD to (1 - pRaise - pCall).coerceAtLeast(0.0)
-        return Policy(normalized(opts), eq, potOdds, icm)
+        return Policy(normalized(opts), eq, potOdds, icm, reasons = reasons)
     }
 }

@@ -4,10 +4,6 @@ import com.riverrunner.Fmt
 import com.riverrunner.PlatformBackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -272,9 +268,7 @@ private fun SidePanel(
 
 @Composable
 private fun pulse(): Float {
-    val tr = rememberInfiniteTransition(label = "panelPulse")
-    val v by tr.animateFloat(0f, 1f, infiniteRepeatable(tween(700, easing = LinearEasing), RepeatMode.Reverse), label = "p")
-    return v
+    return settlingPulse()
 }
 
 /** ⚙ menu with the table switches (practice info, review each hand, HUD, feedback, sound) and the guide. */
@@ -360,7 +354,10 @@ private fun FeedbackCard(f: DecisionFeedback, fmt: (Int) -> String) {
                 "$name ${Format.pct(p)}$sizeNote"
             }
         }
-        Text("GTO " + parts.joinToString(" · "), color = Palette.Accent, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("GTO " + parts.joinToString(" · "), modifier = Modifier.weight(1f), color = Palette.Accent, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2)
+            PolicyExplanation(f.policy)
+        }
     }
 }
 
@@ -510,11 +507,13 @@ private fun WaitingBar(ui: TableScreenUi, onFastForward: () -> Unit) {
 
 @Composable
 private fun ThinkingDots() {
-    val tr = rememberInfiniteTransition(label = "dots")
-    val p by tr.animateFloat(0f, 3f, infiniteRepeatable(tween(900, easing = LinearEasing)), label = "d")
+    var p by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) { kotlinx.coroutines.delay(300); p = (p + 1) % 3 }
+    }
     Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         for (i in 0 until 3) {
-            val on = p.toInt() == i
+            val on = p == i
             Box(Modifier.size(5.dp).clip(CircleShape).background(if (on) Palette.Accent else Palette.PanelHi2))
         }
     }

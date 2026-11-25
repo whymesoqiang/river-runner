@@ -6,14 +6,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -372,9 +368,7 @@ private fun DealIn(key: Long, delayMs: Int, from: Offset, enabled: Boolean, cont
 @Composable
 private fun actingPulse(active: Boolean): Float {
     if (!active) return 0f
-    val tr = rememberInfiniteTransition(label = "pulse")
-    val v by tr.animateFloat(0.35f, 1f, infiniteRepeatable(tween(650, easing = LinearEasing), RepeatMode.Reverse), label = "pulseV")
-    return v
+    return settlingPulse()
 }
 
 @Composable
@@ -614,4 +608,18 @@ private fun WinChip(key: Long, amount: Int, pot: Offset, seat: Offset, fmt: (Int
             ChipLabel(fmt(amount), color = Palette.Green)
         }
     }
+}
+
+/** Catch the player's attention, then stop scheduling frames while they think. */
+@Composable
+internal fun settlingPulse(): Float {
+    val value = remember { Animatable(0.35f) }
+    LaunchedEffect(Unit) {
+        repeat(2) {
+            value.animateTo(1f, tween(650))
+            value.animateTo(0.35f, tween(650))
+        }
+        value.animateTo(1f, tween(350))
+    }
+    return value.value
 }

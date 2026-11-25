@@ -165,8 +165,10 @@ fun ReplayContent(
     val equityCache = remember(record.id) { mutableStateMapOf<String, Map<Int, Double>>() }
     val live = frame.players.filter { !it.folded }
     val eqKey = "${frame.board.size}:" + live.joinToString(",") { it.seat.toString() }
-    LaunchedEffect(eqKey) {
-        if (equityCache[eqKey] == null && live.size >= 2) {
+    LaunchedEffect(record.id, eqKey, frame.isEnd) {
+        if (!frame.isEnd && equityCache[eqKey] == null && live.size >= 2) {
+            // Debounce rapid navigation; don't calculate frames the user has already left.
+            kotlinx.coroutines.delay(150)
             val eq = withContext(Dispatchers.Default) {
                 Equity.showdown(live.map { it.hole }, frame.board, Random(record.id), 30000)
             }
@@ -184,12 +186,13 @@ fun ReplayContent(
     val voluntary = record.actions.filter { !it.type.isPost }
     val heroAction = if (decisionIndex >= 0) voluntary.getOrNull(decisionIndex) else null
     val policyCache = remember(record.id) { mutableStateMapOf<Int, Policy>() }
-    LaunchedEffect(decisionIndex) {
+    LaunchedEffect(record.id, decisionIndex) {
         if (decisionIndex >= 0 && policyCache[decisionIndex] == null) {
+            kotlinx.coroutines.delay(150)
             val p = withContext(Dispatchers.Default) {
                 runCatching {
                     val e = replayer.engineBeforeAction(decisionIndex)
-                    Bot.decide(e, record.heroSeat, BotStyle.GTO, Random(record.id + decisionIndex))
+                    Bot.decide(e, record.heroSeat, BotStyle.GTO, Random(record.id + decisionIndex), record.tournamentContext())
                 }.getOrNull()
             }
             if (p != null) policyCache[decisionIndex] = p
@@ -258,7 +261,10 @@ private fun AnalysisCard(heroAction: Action, decided: Boolean, policy: Policy?, 
                 "$name ${Format.pct(p)}"
             }
         }
-        Text("${st.gtoSuggest}: " + parts.joinToString(" / "), color = Palette.Accent, fontSize = 13.sp)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("${st.gtoSuggest}: " + parts.joinToString(" / "), modifier = Modifier.weight(1f), color = Palette.Accent, fontSize = 13.sp)
+            PolicyExplanation(policy)
+        }
         // bet-size mix of the raises, measured against the pot before the decision
         val sizes = policy.options.filter { it.first.type == MoveType.RAISE }
             .groupBy { SizeClass.of(it.first.raiseTo, policy.pot) }

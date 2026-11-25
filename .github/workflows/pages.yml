@@ -1,0 +1,61 @@
+name: Deploy web to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Viewport regression tests
+        run: node --test tools/viewport.test.cjs
+      - name: Engine tests and web distribution
+        run: ./gradlew :engine:jvmTest :web:composeCompatibilityBrowserDistribution --no-daemon
+      - name: Version offline cache
+        env:
+          BUILD_SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          directory = Path('web/build/dist/composeWebCompatibility/productionExecutable')
+          worker = directory / 'sw.js'
+          worker.write_text(worker.read_text().replace('__RR_BUILD__', os.environ['BUILD_SHA']))
+          (directory / '.nojekyll').touch()
+          PY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/build/dist/composeWebCompatibility/productionExecutable
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
