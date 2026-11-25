@@ -119,6 +119,7 @@ data class TableScreenUi(
     /** a finished hand of this session can be replayed */
     val canReplayLast: Boolean = false,
     val soundOn: Boolean = true,
+    val livePolicy: com.riverrunner.engine.Policy? = null,
 )
 
 /** Static info about a seat that lives outside a single hand. */

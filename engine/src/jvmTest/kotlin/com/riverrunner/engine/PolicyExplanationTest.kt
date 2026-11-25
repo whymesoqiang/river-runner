@@ -23,6 +23,7 @@ class PolicyExplanationTest {
         assertEquals(pa.options, pb.options)
         assertEquals(pa.equity, pb.equity)
         assertEquals(pa.reasons, pb.reasons)
+        assertEquals(pa.summary, pb.summary)
         assertTrue(pa.reasons.size >= 3)
     }
 
@@ -38,6 +39,8 @@ class PolicyExplanationTest {
                 if (e.phase == Phase.STREET_DONE) { e.dealNextStreet(); continue }
                 val p = Bot.decide(e, e.toAct, BotStyle.GTO, random)
                 assertTrue(p.reasons.size >= 2)
+                assertTrue(p.summary?.zh?.isNotBlank() == true)
+                assertTrue(p.summary?.en?.isNotBlank() == true)
                 assertTrue(p.reasons.all { it.zh.isNotBlank() && it.en.isNotBlank() })
                 assertEquals(1.0, p.options.sumOf { it.second }, 1e-9)
                 e.apply(p.sample(random))

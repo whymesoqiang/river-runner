@@ -73,3 +73,11 @@ test('portrait -> landscape -> resume updates geometry, mounts once and stops po
     dispatch('visibilitychange'); advance(2000);
     assert.equal(app.style.width, '844px'); assert.equal(mounts, 1); assert.equal(callbacks.size, 0);
 });
+
+test('landscape home indicator and notch leave the full app inside safe bounds', () => {
+    const r = measure({ ...env(844, 390), insets: { left: 47, right: 47, bottom: 21 } });
+    assert.equal(r.width, 750);
+    assert.equal(r.height, 369);
+    assert.equal(r.left, 47);
+    assert.equal(r.rotate, false);
+});

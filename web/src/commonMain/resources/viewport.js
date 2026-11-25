@@ -10,10 +10,11 @@
         var left = Math.min(insets.left || 0, 50);
         var right = Math.min(insets.right || 0, 50);
         var top = insets.top || 0;
+        var bottom = insets.bottom || 0;
         return {
             left: Math.round(left + (vv ? vv.offsetLeft || 0 : 0)), top: Math.round(top + (vv ? vv.offsetTop || 0 : 0)),
             width: Math.max(1, Math.round(width - left - right)),
-            height: Math.max(1, Math.round(height - top)),
+            height: Math.max(1, Math.round(height - top - bottom)),
             // iPad split view remains usable; an iPhone should never show a miniature strip.
             rotate: env.phone && height > width
         };
@@ -32,7 +33,7 @@
         var rect = measure({
             visualViewport: root.visualViewport,
             innerWidth: root.innerWidth, innerHeight: root.innerHeight, phone: phone,
-            insets: { left: parseFloat(cs.paddingLeft), right: parseFloat(cs.paddingRight), top: parseFloat(cs.paddingTop) }
+            insets: { left: parseFloat(cs.paddingLeft), right: parseFloat(cs.paddingRight), top: parseFloat(cs.paddingTop), bottom: parseFloat(cs.paddingBottom) }
         });
         doc.documentElement.classList.toggle('rr-rotate', rect.rotate);
         var size = [rect.left, rect.top, rect.width, rect.height].join(':');

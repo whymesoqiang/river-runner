@@ -3,6 +3,8 @@ package com.riverrunner.ui
 import com.riverrunner.PlatformBackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -202,39 +204,39 @@ fun ReplayContent(
     val table = replayTable(st, record, frames, idx, equityCache[eqKey], fmt)
     val log = remember(record.id, st) { replayLog(st, record, frames, fmt) }
 
-    Row(Modifier.fillMaxSize().background(Palette.Bg)) {
-        Box(Modifier.weight(1f).fillMaxHeight().padding(start = 4.dp, top = 4.dp, bottom = 2.dp)) {
-            PokerTable(table, fmt, st.pot, Modifier.fillMaxSize(), animateDeal = false)
-        }
-        Column(
-            Modifier.width(240.dp).fillMaxHeight().background(Palette.Panel).padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                SmallButton("←", onBack)
-                Column(Modifier.weight(1f).padding(start = 6.dp)) {
-                    Text(
-                        "${st.replay} · ${st.handNo(record.handNumber)}", color = Palette.Text, fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold, maxLines = 1,
-                    )
-                    Text(com.riverrunner.engine.Stats.positionOf(record), color = Palette.TextDim, fontSize = 11.sp, maxLines = 1)
+    BoxWithConstraints(Modifier.fillMaxSize().background(Palette.Bg)) {
+        val panelWidth = (maxWidth * 0.38f).coerceIn(260.dp, 360.dp)
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(1f).fillMaxHeight().padding(start = 4.dp, top = 4.dp, bottom = 2.dp)) {
+                PokerTable(table, fmt, st.pot, Modifier.fillMaxSize(), animateDeal = false)
+            }
+            Column(
+                Modifier.width(panelWidth).fillMaxHeight().background(Palette.Panel).padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SmallButton("←", onBack)
+                    Column(Modifier.weight(1f).padding(start = 6.dp)) {
+                        Text(
+                            "${st.replay} · ${st.handNo(record.handNumber)}", color = Palette.Text, fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold, maxLines = 1,
+                        )
+                        Text("${com.riverrunner.engine.Stats.positionOf(record)} · ${idx + 1}/${frames.size}", color = Palette.TextDim, fontSize = 11.sp, maxLines = 1)
+                    }
+                    SmallButton(if (record.favorite) "★" else "☆", onStar, highlight = record.favorite)
                 }
-            }
-            // starring is labelled and sits right under the title, so a hand is easy to find again in History
-            SmallButton(
-                (if (record.favorite) "★ " else "☆ ") + st.starHand, onStar, Modifier.fillMaxWidth(),
-                highlight = record.favorite,
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
-                SmallButton("⏮", { idx = 0 }, Modifier.weight(1f))
-                SmallButton("◀", { if (idx > 0) idx-- }, Modifier.weight(1.3f))
-                SmallButton("▶", { if (idx < frames.size - 1) idx++ }, Modifier.weight(1.3f), highlight = true)
-                SmallButton("⏭", { idx = frames.size - 1 }, Modifier.weight(1f))
-            }
-            if (heroAction != null) AnalysisCard(heroAction, frame.action?.seat == record.heroSeat, policy, fmt)
-            ActionLog(log, Modifier.weight(1f), highlightIndex = idx, onClick = { idx = it })
-            if (onContinue != null) {
-                ActionButton(continueLabel ?: st.reviewNext, Palette.Gold, Modifier.fillMaxWidth(), textColor = Palette.Ink, onClick = onContinue)
+                if (heroAction != null) AnalysisCard(heroAction, frame.action?.seat == record.heroSeat, policy, fmt)
+                HistoryPanel(log, Modifier.weight(1f), highlightIndex = idx, onClick = { idx = it })
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+                    SmallButton("⏮", { idx = 0 }, Modifier.weight(1f))
+                    SmallButton("◀", { if (idx > 0) idx-- }, Modifier.weight(1f))
+                    SmallButton("▶", { if (idx < frames.size - 1) idx++ }, Modifier.weight(1f), highlight = true)
+                    SmallButton("⏭", { idx = frames.size - 1 }, Modifier.weight(1f))
+                    if (onContinue != null) {
+                        ActionButton(continueLabel ?: st.reviewNext, Palette.Gold,
+                            Modifier.weight(2.7f).height(40.dp), textColor = Palette.Ink, onClick = onContinue)
+                    }
+                }
             }
         }
     }
@@ -243,56 +245,11 @@ fun ReplayContent(
 @Composable
 private fun AnalysisCard(heroAction: Action, decided: Boolean, policy: Policy?, fmt: (Int) -> String) {
     val st = LocalStrings.current
-    Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Palette.PanelHi).padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        if (decided) {
-            Text("${st.yourAction}: ${TableMapper.actionLabel(st, heroAction, fmt)}", color = Palette.Text, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-        if (policy == null) {
-            Text(st.computing, color = Palette.TextDim, fontSize = 12.sp)
-            return@Column
-        }
-        val dist = policy.options.groupBy { it.first.type }.mapValues { e -> e.value.sumOf { it.second } }
-        val parts = listOf(MoveType.FOLD, MoveType.CHECK, MoveType.CALL, MoveType.RAISE).mapNotNull { t ->
-            dist[t]?.let { p ->
-                val name = when (t) { MoveType.FOLD -> st.fold; MoveType.CHECK -> st.check; MoveType.CALL -> st.call; MoveType.RAISE -> st.raise }
-                "$name ${Format.pct(p)}"
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("${st.gtoSuggest}: " + parts.joinToString(" / "), modifier = Modifier.weight(1f), color = Palette.Accent, fontSize = 13.sp)
-            PolicyExplanation(policy)
-        }
-        // bet-size mix of the raises, measured against the pot before the decision
-        val sizes = policy.options.filter { it.first.type == MoveType.RAISE }
-            .groupBy { SizeClass.of(it.first.raiseTo, policy.pot) }
-            .mapValues { e -> e.value.sumOf { it.second } }
-        if (sizes.isNotEmpty()) {
-            val line = SizeClass.entries.mapNotNull { c -> sizes[c]?.let { "${sizeName(st, c)} ${Format.pct(it)}" } }
-            Text("${st.gtoSizing}: " + line.joinToString(" / "), color = Palette.Accent, fontSize = 12.sp)
-        }
-        if (decided) {
-            val t = when (heroAction.type) {
-                ActionType.FOLD -> MoveType.FOLD; ActionType.CHECK -> MoveType.CHECK
-                ActionType.CALL -> MoveType.CALL; else -> MoveType.RAISE
-            }
-            val ok = (dist[t] ?: 0.0) >= com.riverrunner.engine.Deviation.ACTION_MIN
-            Text(
-                if (ok) "✓ ${st.inLine}" else "⚠ ${st.deviation}",
-                color = if (ok) Palette.Green else Palette.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold,
-            )
-            if (t == MoveType.RAISE) {
-                val mine = SizeClass.of(heroAction.streetTotal, policy.pot)
-                val sizeOk = (sizes[mine] ?: 0.0) >= com.riverrunner.engine.Deviation.SIZE_MIN
-                Text(
-                    if (sizeOk) "✓ ${sizeName(st, mine)}" else "⚠ ${st.sizeOff}: ${sizeName(st, mine)}",
-                    color = if (sizeOk) Palette.Green else Palette.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold,
-                )
-            }
-        }
-        policy.equity?.let { Text("${st.estEquity}: ${Format.pct(it)}", color = Palette.TextDim, fontSize = 11.sp) }
-        if (policy.potOdds > 0) Text("${st.needEquity}: ${Format.pct(policy.potOdds)}", color = Palette.TextDim, fontSize = 11.sp)
-    }
+    val heading = if (decided) "${st.yourAction}: ${TableMapper.actionLabel(st, heroAction, fmt)}" else
+        if (st.isZh) "行动前建议 · 近似策略" else "Before acting · approximate strategy"
+    val verdict = if (decided && policy != null) {
+        if (com.riverrunner.engine.Deviation.judge(policy, heroAction) == com.riverrunner.engine.Deviation.Verdict.OK)
+            "✓ ${st.inLine} · " else "⚠ ${st.deviation} · "
+    } else ""
+    AdviceCard(policy, verdict + heading)
 }

@@ -56,6 +56,7 @@ class Policy(
     /** pot when the decision was made, used to classify bet sizes */
     val pot: Int = 0,
     val reasons: List<PolicyReason> = emptyList(),
+    val summary: PolicyReason? = null,
 ) {
     fun sample(random: Random): Move {
         var r = random.nextDouble()
@@ -334,7 +335,7 @@ object Bot {
         require(la.seat == seat)
         val p = if (engine.street == Street.PREFLOP) preflop(engine, seat, style, la, random, tournament)
         else postflop(engine, seat, style, la, random, tournament)
-        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons)
+        return Policy(p.options, p.equity, p.potOdds, p.icmRequired, la.pot, p.reasons, p.summary)
     }
 
     /**
@@ -455,6 +456,7 @@ object Bot {
             "${HandClasses.className(me.hole[0], me.hole[1])} ranks in the top ${pctText(pct)} of this engine's hand ordering (not equity); $behind players remain behind, effective stack ${number(effBB)} BB."
         ))
         fun explain(zh: String, en: String) { reasons += PolicyReason(zh, en) }
+        var summary: PolicyReason? = null
         // ---- big calls (facing a shove or a raise that commits a large part of the stack)
         if (la.toCall > 0 && (la.toCall >= me.stack * 0.4 || engine.players.any { it.allIn && !it.folded && it.seat != seat && it.streetBet >= la.currentBet })) {
             val opps = engine.players.filter { !it.folded && it.seat != seat }
@@ -463,6 +465,9 @@ object Bot {
             val (req, icm) = requiredEquity(engine, seat, la, t)
             val margin = eq + style.callBias * 0.5 - req
             val pCall = above(margin, 0.0, 0.02)
+            summary = PolicyReason(
+                if (margin >= 0) "估计胜率达到大额跟注门槛，倾向继续。" else "估计胜率不足以支付大额跟注，倾向弃牌。",
+                if (margin >= 0) "Estimated equity meets the large-call threshold, favoring continuation." else "Estimated equity falls below the large-call threshold, favoring a fold.")
             val canJam = la.canRaise && raises <= 3 && pct < 0.03 * style.aggression
             if (canJam) opts += Move.raiseTo(la.maxRaiseTo) to pCall
             else opts += Move.CALL to pCall
@@ -471,7 +476,7 @@ object Bot {
                 "Facing a large call: simulated range equity ${pctText(eq)}, calling threshold ${pctText(req)}. Adjusted equity minus threshold is ${pctText(margin)}; a larger margin favors continuing, with mixed actions near the threshold.")
             if (icm != null) explain("此处计入 ICM 奖金权益；门槛取 ICM 与底池赔率中的较高值。", "ICM prize equity applies here; the threshold is the larger of ICM and pot odds.")
             if (canJam) explain("手牌进入再推范围且允许加注，继续部分改为全下。", "This hand qualifies for the re-shove range and raising is legal, so the continuing portion shoves.")
-            return Policy(normalized(opts), eq, la.toCall.toDouble() / (la.pot + la.toCall), icm, reasons = reasons)
+            return Policy(normalized(opts), eq, la.toCall.toDouble() / (la.pot + la.toCall), icm, reasons = reasons, summary = summary)
         }
 
         if (raises == 0) {
@@ -481,23 +486,29 @@ object Bot {
                 // big blind option after limps / folds
                 val thr = 0.12 * style.looseness * style.aggression
                 explain("可以免费过牌；加注范围中心为前 ${pctText(thr)}，弱牌更多过牌，边缘牌混合。隔离尺度随跛入人数增加。", "Checking is free; the raise-range midpoint is top ${pctText(thr)}. Weaker hands check more, borderline hands mix; isolation sizing grows with limpers.")
+                summary = PolicyReason(if (pct < thr) "手牌进入隔离加注范围，可向跛入者施压。" else "手牌偏弱且可以免费过牌，无需扩大底池。",
+                    if (pct < thr) "This hand enters the isolation range against limpers." else "A weaker hand can check for free without building the pot.")
                 val pR = smooth(pct, thr, 0.02)
                 val size = bb * (3 + limpers)
                 if (la.canRaise) opts += raiseMove(la, size) to pR
                 opts += Move.CHECK to (1 - pR)
-                return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
+                return Policy(normalized(opts), null, 0.0, null, reasons = reasons, summary = summary)
             }
             if (effBB <= 13 && t != null || effBB <= 10) {
                 val w = pushWidth(effBB, behind) * (if (hu) 1.07 else 1.0) * style.looseness
                 explain("短筹码推/弃分支：推牌范围中心为前 ${pctText(w)}，由有效筹码、后位人数与风格调整；边缘牌混合全下和弃牌。", "Short-stack push/fold: shove-range midpoint top ${pctText(w)}, adjusted for stack depth, players behind and style; marginal hands mix shoves and folds.")
+                summary = PolicyReason(if (pct < w) "筹码较浅，手牌进入当前推牌范围。" else "筹码较浅，但手牌未达到当前推牌门槛。",
+                    if (pct < w) "At this shallow stack, the hand enters the shove range." else "At this shallow stack, the hand falls outside the shove range.")
                 val pJam = smooth(pct, w, 0.012)
                 opts += Move.raiseTo(la.maxRaiseTo) to pJam
                 opts += Move.FOLD to (1 - pJam)
-                return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
+                return Policy(normalized(opts), null, 0.0, null, reasons = reasons, summary = summary)
             }
             var thr = rfiWidth(behind, hu) * style.looseness
             if (limpers > 0) thr *= 0.65
             explain("无人加注时，开池范围中心为前 ${pctText(thr)}；位置越靠后通常范围越宽，有跛入时收紧。起手牌越强于该门槛，加注频率越高。", "Unraised pot: opening-range midpoint top ${pctText(thr)}. Later positions usually open wider; limpers tighten the range. Hands stronger than the midpoint raise more often.")
+            summary = PolicyReason(if (pct < thr) "手牌达到当前位置的开池门槛，主动加注争取底池。" else "手牌未达到当前位置的开池门槛，避免投入更多筹码。",
+                if (pct < thr) "This hand meets the opening threshold for this position." else "This hand falls below the opening threshold for this position.")
             val pRaise = smooth(pct, thr, 0.02)
             val openBB = when {
                 hu -> 2.5
@@ -517,7 +528,7 @@ object Bot {
             } else {
                 opts += Move.FOLD to (1 - pRaise)
             }
-            return Policy(normalized(opts), null, 0.0, null, reasons = reasons)
+            return Policy(normalized(opts), null, 0.0, null, reasons = reasons, summary = summary)
         }
 
         val potOdds = la.toCall.toDouble() / (la.pot + la.toCall)
@@ -586,7 +597,13 @@ object Bot {
                 opts += Move.FOLD to (1 - pJam - pCall).coerceAtLeast(0.0)
             }
         }
-        return Policy(normalized(opts), null, potOdds, null, reasons = reasons)
+        val main = opts.groupBy { it.first.type }.maxByOrNull { e -> e.value.sumOf { it.second } }?.key
+        summary = when (main) {
+            MoveType.FOLD -> PolicyReason("面对加注，手牌主要落在当前位置的继续范围之外。", "Facing a raise, this hand mostly falls outside this position's continuing range.")
+            MoveType.RAISE -> PolicyReason("手牌进入再加注范围，以价值牌或部分同花诈唬施压。", "This hand enters the re-raise range as value or a suited bluff.")
+            else -> PolicyReason("手牌进入跟注范围，保留筹码而非进一步扩大底池。", "This hand enters the calling range without building a larger pot through a raise.")
+        }
+        return Policy(normalized(opts), null, potOdds, null, reasons = reasons, summary = summary)
     }
 
     private fun postflop(engine: HandEngine, seat: Int, style: BotStyle, la: LegalActions, random: Random, t: TournamentContext?): Policy {
@@ -616,13 +633,15 @@ object Bot {
             "Against $nOpp opponents' ranges inferred from public actions, simulated equity is ${pctText(eq)} (${number(rel)} times an equal pot share). SPR ${number(spr)}, ${if (ip) "in position" else "out of position"}, board wetness ${number(wet)} (higher means more draws)."
         ))
         fun explain(zh: String, en: String) { reasons += PolicyReason(zh, en) }
+        var summary: PolicyReason? = null
 
         explain("引擎牌力分类：${listOf("空气牌", "听牌", "弱成牌", "强一对", "两对或更强")[cls]}；${if (initiative) "持有" else "没有"}前街主动权。", "Engine hand class: ${listOf("air", "draw", "weak made hand", "strong one-pair", "two-pair or better")[cls]}; ${if (initiative) "has" else "does not have"} prior-street initiative.")
         if (la.toCall == 0) {
             // ---------------- we can check or bet
             if (!la.canRaise) {
                 explain("无需跟注且不能加注，合法行动为过牌。", "No call is required and raising is unavailable; check is the legal action.")
-                return Policy(listOf(Move.CHECK to 1.0), eq, 0.0, null, reasons = reasons)
+                summary = PolicyReason("无需跟注且不能加注，免费过牌即可。", "No call is needed and raising is unavailable: check for free.")
+                return Policy(listOf(Move.CHECK to 1.0), eq, 0.0, null, reasons = reasons, summary = summary)
             }
             val valueThr = when (street) { Street.FLOP -> 1.22; Street.TURN -> 1.3; else -> 1.4 }
             explain("价值下注参考门槛为均分份额的 ${number(valueThr)} 倍；当前${if (rel >= valueThr) "高于" else "低于"}门槛。低于门槛时，听牌、前街主动权和位置决定诈唬频率；多人底池降低诈唬频率，中等成牌偏向控池。",
@@ -658,8 +677,13 @@ object Bot {
                     opts += raiseMove(la, chips) to pBet * w
                 }
             }
+            summary = when {
+                pBet < 0.5 -> PolicyReason("当前价值下注优势有限，更多过牌控制底池。", "The current value-betting edge is limited, so checking is more frequent.")
+                rel >= valueThr -> PolicyReason("对推测范围有足够胜率优势，下注争取价值。", "The equity edge against inferred ranges supports betting for value.")
+                else -> PolicyReason("利用听牌或位置与主动权，以诈唬争取弃牌。", "Draws, position or initiative support a bluff to generate folds.")
+            }
             opts += Move.CHECK to (1 - pBet)
-            return Policy(normalized(opts), eq, 0.0, null, reasons = reasons)
+            return Policy(normalized(opts), eq, 0.0, null, reasons = reasons, summary = summary)
         }
 
         // ---------------- facing a bet
@@ -709,6 +733,11 @@ object Bot {
         }
         opts += Move.CALL to pCall
         opts += Move.FOLD to (1 - pRaise - pCall).coerceAtLeast(0.0)
-        return Policy(normalized(opts), eq, potOdds, icm, reasons = reasons)
+        summary = when {
+            pRaise >= pCall && pRaise >= 1 - pRaise - pCall -> PolicyReason("价值优势或听牌半诈唬支持加注施压。", "Value strength or a drawing semi-bluff supports raising.")
+            pCall >= 1 - pRaise - pCall -> PolicyReason("调整后胜率或小注防守规则支持跟注继续。", "Adjusted equity or the small-bet defense rule supports calling.")
+            else -> PolicyReason("调整后胜率不足以覆盖跟注门槛，倾向弃牌。", "Adjusted equity falls short of the calling threshold, favoring a fold.")
+        }
+        return Policy(normalized(opts), eq, potOdds, icm, reasons = reasons, summary = summary)
     }
 }

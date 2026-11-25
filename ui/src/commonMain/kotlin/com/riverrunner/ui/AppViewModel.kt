@@ -192,6 +192,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
 
     /** GTO feedback on the hero's last decision this hand. */
     var feedback by mutableStateOf<DecisionFeedback?>(null); private set
+    private var livePolicy by mutableStateOf<com.riverrunner.engine.Policy?>(null)
     /** Report of the session that just ended (for the result screen). */
     var sessionReport by mutableStateOf<SessionReport?>(null); private set
 
@@ -244,7 +245,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
             notice = notice, soundOn = soundOn,
             starred = starHand, reviewEach = reviewEachHand,
             showHud = showHud, showDeviation = showDeviation, feedback = feedback,
-            canReplayLast = lastSessionRecord != null,
+            canReplayLast = lastSessionRecord != null, livePolicy = livePolicy,
         )
 
     private var session: GameSession? = null
@@ -285,6 +286,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
         tally = DeviationTally()
         handVerdicts.clear()
         feedback = null
+        livePolicy = null
         sessionReport = null
         practice = prefs.practiceDefault
         sessionOver = false
@@ -401,6 +403,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
             starHand = false
             lastRecordId = null
             feedback = null
+            livePolicy = null
             handVerdicts.clear()
             heroInHand = true
             fastForward = false
@@ -456,6 +459,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                                 me.stack.toDouble() / maxOf(1, la.pot),
                                 TableMapper.handText(strings, me.hole, e.board),
                             )
+                            livePolicy = null
                             legal = la
                             publish(s, e, TableMapper.Stage.LIVE)
                             sound.play(Sound.TURN, 0.55f, varyPitch = false)
@@ -469,7 +473,13 @@ class AppViewModel(val platform: Platform) : ViewModel() {
                             }
                             val d = CompletableDeferred<Move>()
                             heroMove = d
+                            val adviceJob = viewModelScope.launch {
+                                val ready = policyJob.await()
+                                if (heroMove === d && !d.isCompleted) livePolicy = ready
+                            }
                             val move = d.await()
+                            adviceJob.cancel()
+                            livePolicy = null
                             heroMove = null
                             legal = null
                             practiceInfo = null

@@ -23,6 +23,7 @@ import com.riverrunner.engine.SizeClass
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -146,29 +147,32 @@ fun TableContent(
     LaunchedEffect(turnKey) {
         if (turnKey != null) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
     }
-    Row(Modifier.fillMaxSize().background(Palette.Bg)) {
-        Box(Modifier.weight(1f).fillMaxHeight().padding(start = 4.dp, top = 4.dp, bottom = 2.dp)) {
-            val t = ui.table
-            if (t != null) PokerTable(t, fmt, st.pot, Modifier.fillMaxSize(), animateDeal = animate)
-            androidx.compose.animation.AnimatedVisibility(
-                ui.notice != null,
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = 64.dp),
-                enter = androidx.compose.animation.slideInVertically { -it } + fadeIn(),
-                exit = fadeOut(tween(400)),
-            ) {
-                Text(
-                    ui.notice ?: "", color = Palette.Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 18.sp,
-                    modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(Palette.Gold)
-                        .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                )
+    BoxWithConstraints(Modifier.fillMaxSize().background(Palette.Bg)) {
+        val panelWidth = (maxWidth * 0.38f).coerceIn(260.dp, 360.dp)
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(1f).fillMaxHeight().padding(start = 4.dp, top = 4.dp, bottom = 2.dp)) {
+                val t = ui.table
+                if (t != null) PokerTable(t, fmt, st.pot, Modifier.fillMaxSize(), animateDeal = animate)
+                androidx.compose.animation.AnimatedVisibility(
+                    ui.notice != null,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 64.dp),
+                    enter = androidx.compose.animation.slideInVertically { -it } + fadeIn(),
+                    exit = fadeOut(tween(400)),
+                ) {
+                    Text(
+                        ui.notice ?: "", color = Palette.Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 18.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(Palette.Gold)
+                            .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
             }
+            SidePanel(
+                ui, fmt, onMove, onNext, onFastForward, onPractice, onExit, onHelp, onSound, onStar, onReview,
+                onHud, onDeviation, onReplayLast, panelWidth,
+            )
         }
-        SidePanel(
-            ui, fmt, onMove, onNext, onFastForward, onPractice, onExit, onHelp, onSound, onStar, onReview,
-            onHud, onDeviation, onReplayLast,
-        )
     }
 }
 
@@ -188,12 +192,13 @@ private fun SidePanel(
     onHud: (Boolean) -> Unit,
     onDeviation: (Boolean) -> Unit,
     onReplayLast: () -> Unit,
+    panelWidth: androidx.compose.ui.unit.Dp,
 ) {
     val st = LocalStrings.current
     val heroTurn = ui.legal != null
     val glow = if (heroTurn) pulse() else 0f
     Column(
-        Modifier.width(212.dp).fillMaxHeight().background(Palette.Panel)
+        Modifier.width(panelWidth).fillMaxHeight().background(Palette.Panel)
             .border(if (heroTurn) 2.dp else 0.dp, Palette.Accent.copy(alpha = 0.25f + 0.6f * glow), RoundedCornerShape(0.dp))
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -202,7 +207,7 @@ private fun SidePanel(
         // menu so the practice info and the action log keep their room on short screens.
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(st.handNo(ui.handNumber), color = Palette.Text, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(st.handNo(ui.handNumber) + if (heroTurn) " · ${st.yourTurn}" else "", color = Palette.Text, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.weight(1f))
                 RoundIcon(if (ui.starred) "★" else "☆", st.starHand, onStar)
                 // the previous hand of this session, e.g. after skipping its review by mistake
                 if (ui.canReplayLast) {
@@ -230,9 +235,10 @@ private fun SidePanel(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                         val info = ui.practiceInfo
-                        if (ui.practice && info != null) PracticeHud(info, fmt)
+                        if (heroTurn) AdviceCard(ui.livePolicy)
+                        else if (ui.practice && info != null) PracticeHud(info, fmt)
                         androidx.compose.foundation.layout.BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
-                            if (maxHeight > 36.dp) ActionLog(ui.log, Modifier.fillMaxSize())
+                            HistoryPanel(ui.log, Modifier.fillMaxSize())
                         }
                     }
                 }
@@ -326,39 +332,8 @@ private fun MenuSwitch(label: String, on: Boolean, onToggle: () -> Unit) {
 @Composable
 private fun FeedbackCard(f: DecisionFeedback, fmt: (Int) -> String) {
     val st = LocalStrings.current
-    val ok = f.verdict == Deviation.Verdict.OK
-    val tone = if (ok) Palette.Green else Palette.Red
-    val shape = RoundedCornerShape(8.dp)
-    Column(
-        Modifier.fillMaxWidth().clip(shape).background(Palette.PanelHi)
-            .border(1.dp, tone.copy(alpha = 0.55f), shape)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-    ) {
-        val mine = TableMapper.actionLabel(st, f.action, fmt)
-        val head = when (f.verdict) {
-            Deviation.Verdict.OK -> "✓ ${st.inLine} · $mine"
-            Deviation.Verdict.ACTION -> "⚠ ${st.deviation} · $mine"
-            Deviation.Verdict.SIZE -> "⚠ ${st.sizeOff} · $mine"
-        }
-        Text(head, color = tone, fontSize = 12.sp, lineHeight = 15.sp, fontWeight = FontWeight.Bold, maxLines = 2)
-        val mix = Deviation.actionMix(f.policy)
-        val sizes = Deviation.sizeMix(f.policy)
-        // one line: "GTO 弃牌 20% · 跟注 55% · 加注 25%（重注）"; sizes go in brackets after the raise
-        val parts = listOf(MoveType.FOLD, MoveType.CHECK, MoveType.CALL, MoveType.RAISE).mapNotNull { t ->
-            mix[t]?.let { p ->
-                val name = when (t) { MoveType.FOLD -> st.fold; MoveType.CHECK -> st.check; MoveType.CALL -> st.call; MoveType.RAISE -> st.raise }
-                val sizeNote = if (t == MoveType.RAISE && sizes.isNotEmpty()) {
-                    (if (st.isZh) "（" else " (") + SizeClass.entries.filter { it in sizes }.joinToString("/") { sizeName(st, it) } + (if (st.isZh) "）" else ")")
-                } else ""
-                "$name ${Format.pct(p)}$sizeNote"
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("GTO " + parts.joinToString(" · "), modifier = Modifier.weight(1f), color = Palette.Accent, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2)
-            PolicyExplanation(f.policy)
-        }
-    }
+    val verdict = if (f.verdict == Deviation.Verdict.OK) "✓ ${st.inLine}" else "⚠ ${st.deviation}"
+    AdviceCard(f.policy, "$verdict · ${TableMapper.actionLabel(st, f.action, fmt)}")
 }
 
 @Composable
@@ -410,9 +385,19 @@ private fun HudRow(l1: String, v1: String, l2: String?, v2: String?) {
 @Composable
 fun ActionLog(lines: List<LogLine>, modifier: Modifier = Modifier, highlightIndex: Int = -1, onClick: ((Int) -> Unit)? = null) {
     val state = rememberLazyListState()
-    LaunchedEffect(lines.size, highlightIndex) {
+    var followTail by remember { mutableStateOf(true) }
+    LaunchedEffect(state) {
+        androidx.compose.runtime.snapshotFlow { state.isScrollInProgress }.collect { scrolling ->
+            if (scrolling) followTail = false
+            else if (state.layoutInfo.visibleItemsInfo.isNotEmpty()) {
+                followTail = (state.layoutInfo.visibleItemsInfo.last().index >= state.layoutInfo.totalItemsCount - 2)
+            }
+        }
+    }
+    LaunchedEffect(lines.size, highlightIndex, state.layoutInfo.viewportSize) {
         val target = if (highlightIndex >= 0) highlightIndex else lines.size - 1
-        if (target >= 0) state.animateScrollToItem(target)
+        if (target >= 0 && (highlightIndex >= 0 || (followTail && !state.isScrollInProgress)))
+            state.scrollToItem(target)
     }
     LazyColumn(
         modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Palette.Bg).padding(horizontal = 6.dp, vertical = 3.dp),
@@ -558,38 +543,35 @@ private fun HeroControls(la: LegalActions, fmt: (Int) -> String, bb: Int, onMove
     val armed by rememberArmed(la)
     val move: (Move) -> Unit = { if (armed) onMove(it) }
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val p = pulse()
-            Box(Modifier.size(8.dp).clip(CircleShape).background(Palette.Accent.copy(alpha = 0.4f + 0.6f * p)))
-            Spacer(Modifier.width(6.dp))
-            Text(st.yourTurn, color = Palette.Accent, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-        }
         if (la.canRaise) {
-            Row(horizontalArrangement = Arrangement.spacedBy(3.dp), modifier = Modifier.fillMaxWidth()) {
-                for ((label, v) in presets(st, la, bb)) {
-                    val sel = v == target
-                    Box(
-                        Modifier.weight(1f).height(32.dp).pressable { target = v }.clip(RoundedCornerShape(6.dp))
-                            .background(if (sel) Palette.AccentDim else Palette.PanelHi)
-                            .then(if (sel) Modifier.border(1.dp, Palette.Accent, RoundedCornerShape(6.dp)) else Modifier),
-                        contentAlignment = Alignment.Center,
-                    ) { Text(label, color = Palette.Text, fontSize = 11.sp, maxLines = 1, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(3.dp), modifier = Modifier.weight(1f)) {
+                    for ((label, v) in presets(st, la, bb)) {
+                        val sel = v == target
+                        Box(
+                            Modifier.weight(1f).height(32.dp).pressable { target = v }.clip(RoundedCornerShape(6.dp))
+                                .background(if (sel) Palette.AccentDim else Palette.PanelHi)
+                                .then(if (sel) Modifier.border(1.dp, Palette.Accent, RoundedCornerShape(6.dp)) else Modifier),
+                            contentAlignment = Alignment.Center,
+                        ) { Text(label, color = Palette.Text, fontSize = 11.sp, maxLines = 1, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal) }
+                    }
                 }
-            }
-            if (la.maxRaiseTo > la.minRaiseTo) {
-                val step = (bb / 2).coerceAtLeast(1)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    StepButton("−") { target = (target - step).coerceIn(la.minRaiseTo, la.maxRaiseTo) }
-                    BetSlider(
-                        fraction = (target - la.minRaiseTo).toFloat() / (la.maxRaiseTo - la.minRaiseTo),
-                        onChange = { f ->
-                            val raw = la.minRaiseTo + f * (la.maxRaiseTo - la.minRaiseTo)
-                            val snapped = if (f >= 0.995f) la.maxRaiseTo else ((raw / step).roundToInt() * step)
-                            target = snapped.coerceIn(la.minRaiseTo, la.maxRaiseTo)
-                        },
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
-                    )
-                    StepButton("+") { target = (target + step).coerceIn(la.minRaiseTo, la.maxRaiseTo) }
+                if (la.maxRaiseTo > la.minRaiseTo) {
+                    val step = (bb / 2).coerceAtLeast(1)
+                    Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                        StepButton("−") { target = (target - step).coerceIn(la.minRaiseTo, la.maxRaiseTo) }
+                        BetSlider(
+                            fraction = (target - la.minRaiseTo).toFloat() / (la.maxRaiseTo - la.minRaiseTo),
+                            onChange = { f ->
+                                val raw = la.minRaiseTo + f * (la.maxRaiseTo - la.minRaiseTo)
+                                val snapped = if (f >= 0.995f) la.maxRaiseTo else ((raw / step).roundToInt() * step)
+                                target = snapped.coerceIn(la.minRaiseTo, la.maxRaiseTo)
+                            },
+                            modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        )
+                        StepButton("+") { target = (target + step).coerceIn(la.minRaiseTo, la.maxRaiseTo) }
+                    }
                 }
             }
         }
@@ -661,6 +643,35 @@ private fun BetSlider(fraction: Float, onChange: (Float) -> Unit, modifier: Modi
             drawRoundRect(Palette.Accent, Offset(left, y - trackH / 2), Size(x - left, trackH), CornerRadius(trackH / 2))
             drawCircle(Color.White, r + 2.dp.toPx(), Offset(x, y))
             drawCircle(Palette.Accent, r, Offset(x, y))
+        }
+    }
+}
+
+
+@Composable
+internal fun HistoryPanel(lines: List<LogLine>, modifier: Modifier = Modifier,
+                         highlightIndex: Int = -1, onClick: ((Int) -> Unit)? = null) {
+    val zh = LocalStrings.current.isZh
+    var expanded by remember { mutableStateOf(false) }
+    Column(modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (zh) "操作记录" else "Action history", color = Palette.TextDim,
+                fontSize = 11.sp, modifier = Modifier.weight(1f))
+            Text(if (zh) "展开 ↗" else "Expand ↗", color = Palette.Accent, fontSize = 12.sp,
+                modifier = Modifier.pressable { expanded = true }.padding(horizontal = 8.dp, vertical = 7.dp))
+        }
+        ActionLog(lines, Modifier.weight(1f), highlightIndex, onClick)
+    }
+    if (expanded) Dialog(onDismissRequest = { expanded = false },
+        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(Modifier.fillMaxWidth(0.9f).fillMaxHeight(0.9f)
+            .clip(RoundedCornerShape(12.dp)).background(Palette.Panel).padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(if (zh) "操作记录" else "Action history", color = Palette.Text,
+                    modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
+                SmallButton(if (zh) "关闭" else "Close", { expanded = false })
+            }
+            ActionLog(lines, Modifier.weight(1f), highlightIndex, onClick)
         }
     }
 }
