@@ -1,97 +1,67 @@
-// Offline cache for River Runner (web).
-//
-// The first visit downloads about 5 MB; after that every file comes from this cache, so the
-// app opens instantly and works without a network. Each deploy replaces BUILD below (CI
-// writes the commit id), which makes the browser install the new worker. The new worker
-// downloads the new files in the background while the old version keeps working, and takes
-// over on the next start, so the app never runs a mix of two versions.
-
-const BUILD = "__RR_BUILD__";
-const CACHE = "rr-" + BUILD;
-const PREFIX = "rr-";
-
-// Files fingerprinted by content (hex names such as 3ca4ee9449579f086d21.wasm) never change,
-// so the new version can take them over from the old cache instead of downloading them again.
-const FINGERPRINTED = /\/[0-9a-f]{16,}\.[a-z0-9]+$/;
-
-function pageKey(request) {
-    // the page is stored once, whatever query string it was opened with
-    const url = new URL(request.url);
-    return url.origin + url.pathname.replace(/index\.html$/, "");
-}
-
-self.addEventListener("install", (event) => {
-    event.waitUntil((async () => {
-        const cache = await caches.open(CACHE);
-        // Needed even if the first hand is started after the device goes offline.
-        await cache.addAll(["compute-worker.js", "strategyWorker.js", "audio-player.js"]);
-        // Carry over what the previous version had: fingerprinted files are copied,
-        // the rest are downloaded fresh. Files new in this version are cached on first use.
-        for (const name of await caches.keys()) {
-            if (!name.startsWith(PREFIX) || name === CACHE) continue;
-            const old = await caches.open(name);
-            for (const req of await old.keys()) {
-                try {
-                    if (FINGERPRINTED.test(new URL(req.url).pathname)) {
-                        const res = await old.match(req);
-                        if (res) await cache.put(req, res);
-                    } else {
-                        const res = await fetch(req.url, { cache: "no-cache" });
-                        if (res.ok) await cache.put(req, res);
-                    }
-                } catch (e) { /* offline or removed: fetched again when used */ }
+// Versioned application assets only. User records/favorites/settings live in
+// localStorage and are never touched by installation, activation or cache cleanup.
+const BUILD = '__RR_BUILD__';
+const requestedRuntime = new URL(self.location.href).searchParams.get('runtime');
+// Legacy pages register sw.js without a runtime. Cache both once for that migration.
+const RUNTIME = ['js', 'wasm'].includes(requestedRuntime) ? requestedRuntime : 'both';
+const CACHE = 'rr-' + BUILD + '-' + RUNTIME;
+const VERSION = '__RR_VERSION__';
+const RELEASE = new URL('release.json', self.registration.scope).href;
+function pageKey(url) { return url.origin + url.pathname.replace(/index\.html$/, ''); }
+self.addEventListener('install', event => event.waitUntil((async () => {
+    const response = await fetch(RELEASE, { cache: 'no-store' });
+    if (!response.ok) throw new Error('Release unavailable');
+    const release = await response.json();
+    if (release.build !== BUILD) throw new Error('Deployment not ready');
+    const names = (await caches.keys()).filter(n => n.startsWith('rr-') && n !== CACHE);
+    const old = await Promise.all(names.map(n => caches.open(n)));
+    const modern = (await Promise.all(old.map(c => c.match(RELEASE)))).some(Boolean);
+    const cache = await caches.open(CACHE);
+    try {
+        const assets = RUNTIME === 'both' ? [...new Set([...release.assets.js, ...release.assets.wasm])] : release.assets[RUNTIME];
+        for (const path of assets) {
+            const url = new URL(path, self.registration.scope);
+            // Reuse only content-addressed binaries; named scripts/resources must be fresh.
+            let result;
+            if (/\/[0-9a-f]{16,}\.wasm$/.test(url.pathname)) {
+                for (const previous of old) { result = await previous.match(url.href); if (result) break; }
             }
+            if (!result) result = await fetch(url.href, { cache: 'reload' });
+            if (!result.ok) throw new Error('Asset unavailable: ' + path);
+            await cache.put(path === 'index.html' ? pageKey(url) : url.href, result);
         }
-        await self.skipWaiting();
-    })());
-});
-
-self.addEventListener("activate", (event) => {
-    event.waitUntil((async () => {
-        for (const name of await caches.keys()) {
-            if (name.startsWith(PREFIX) && name !== CACHE) await caches.delete(name);
-        }
-        await self.clients.claim();
-    })());
-});
-
-self.addEventListener("fetch", (event) => {
-    const req = event.request;
-    if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
-    const isPage = req.mode === "navigate";
-    // the worker script itself always comes from the network (that is how updates are found)
-    if (new URL(req.url).pathname.endsWith("/sw.js")) return;
+        await cache.put(RELEASE, new Response(JSON.stringify(release), { headers: { 'Content-Type': 'application/json' } }));
+    } catch (error) { await caches.delete(CACHE); throw error; }
+    // One-time migration: old versions have no update button. Later versions wait
+    // for the user's explicit click, so an update never interrupts a training hand.
+    if (!modern) await self.skipWaiting();
+})()));
+self.addEventListener('activate', event => event.waitUntil((async () => {
+    // Retain one previous application cache; saves are never in these caches.
+    const previous = (await caches.keys()).filter(n => n.startsWith('rr-') && n !== CACHE);
+    for (const name of previous.slice(0, -1)) await caches.delete(name);
+    await self.clients.claim();
+})()));
+self.addEventListener('fetch', event => {
+    const req = event.request, url = new URL(req.url);
+    if (req.method !== 'GET' || url.origin !== self.location.origin || /\/(sw\.js|release\.json)$/.test(url.pathname)) return;
     event.respondWith((async () => {
         const cache = await caches.open(CACHE);
-        const key = isPage ? pageKey(req) : req;
-        const hit = await cache.match(key, { ignoreSearch: isPage });
+        const key = req.mode === 'navigate' ? pageKey(url) : req;
+        const hit = await cache.match(key, { ignoreSearch: req.mode === 'navigate' });
         if (hit) return hit;
-        const res = await fetch(req);
-        if (res.ok) {
-            try { await cache.put(key, res.clone()); } catch (e) { /* storage full: still serve it */ }
-        }
-        return res;
+        const response = await fetch(req);
+        if (response.ok) { try { await cache.put(key, response.clone()); } catch (_) {} }
+        return response;
     })());
 });
-
-// The page sends the files it loaded before this worker was in control (the first visit),
-// so they are cached too and the second start is already offline-ready.
-self.addEventListener("message", (event) => {
-    const data = event.data || {};
-    if (data.type !== "cache" || !Array.isArray(data.urls)) return;
+self.addEventListener('message', event => {
+    if (event.data?.type === 'version') { event.ports[0]?.postMessage({ build: BUILD, version: VERSION }); return; }
+    if (event.data?.type !== 'activate') return;
     event.waitUntil((async () => {
-        const cache = await caches.open(CACHE);
-        for (const u of data.urls) {
-            try {
-                const url = new URL(u);
-                if (url.origin !== self.location.origin || url.pathname.endsWith("/sw.js")) continue;
-                const isPage = url.pathname.endsWith("/") || url.pathname.endsWith("/index.html");
-                const key = isPage ? url.origin + url.pathname.replace(/index\.html$/, "") : url.href;
-                if (await cache.match(key)) continue;
-                // usually answered from the browser's HTTP cache, without downloading again
-                const res = await fetch(url.href);
-                if (res.ok) await cache.put(key, res);
-            } catch (e) { /* skip */ }
-        }
+        const windows = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).filter(c => c.url.startsWith(self.registration.scope));
+        if (windows.length > 1) { event.ports[0]?.postMessage('blocked'); return; }
+        event.ports[0]?.postMessage('ok');
+        await self.skipWaiting();
     })());
 });

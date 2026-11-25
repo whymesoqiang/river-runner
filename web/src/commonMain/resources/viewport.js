@@ -13,8 +13,8 @@
         var bottom = insets.bottom || 0;
         return {
             left: Math.round(left + (vv ? vv.offsetLeft || 0 : 0)), top: Math.round(top + (vv ? vv.offsetTop || 0 : 0)),
-            width: Math.max(1, Math.round(width - left - right)),
-            height: Math.max(1, Math.round(height - top - bottom)),
+            width: Math.max(1, Math.round(env.phone && height > width ? height - top - bottom : width - left - right)),
+            height: Math.max(1, Math.round(env.phone && height > width ? width - left - right : height - top - bottom)),
             // iPad split view remains usable; an iPhone should never show a miniature strip.
             rotate: env.phone && height > width
         };
@@ -35,23 +35,26 @@
             innerWidth: root.innerWidth, innerHeight: root.innerHeight, phone: phone,
             insets: { left: parseFloat(cs.paddingLeft), right: parseFloat(cs.paddingRight), top: parseFloat(cs.paddingTop), bottom: parseFloat(cs.paddingBottom) }
         });
-        doc.documentElement.classList.toggle('rr-rotate', rect.rotate);
-        var size = [rect.left, rect.top, rect.width, rect.height].join(':');
+        doc.documentElement.classList.toggle('rr-landscape', rect.rotate);
+        root.__rrRotated = rect.rotate;
+        var size = [rect.left, rect.top, rect.width, rect.height, rect.rotate].join(':');
         var changed = size !== lastSize;
         if (changed) {
             lastSize = size;
-            app.style.left = rect.left + 'px'; app.style.top = rect.top + 'px';
+            app.style.transformOrigin = '0 0';
+            app.style.transform = rect.rotate ? 'rotate(90deg)' : 'none';
+            app.style.left = (rect.left + (rect.rotate ? rect.height : 0)) + 'px'; app.style.top = rect.top + 'px';
             app.style.width = rect.width + 'px'; app.style.height = rect.height + 'px';
             // Compose listens for resize too. Only notify on actual geometry changes,
             // otherwise our resize listener would make an endless animation loop.
             root.dispatchEvent(new root.Event('resize'));
         }
-        if (rect.rotate || changed) {
+        if (changed) {
             root.clearTimeout(readyTimer);
             readyTimer = 0;
             doc.documentElement.removeAttribute('data-rr-viewport-ready');
         }
-        if (!rect.rotate && !readyTimer && doc.documentElement.getAttribute('data-rr-viewport-ready') !== 'true') {
+        if (!readyTimer && doc.documentElement.getAttribute('data-rr-viewport-ready') !== 'true') {
             readyTimer = root.setTimeout(function () {
                 readyTimer = 0;
                 doc.documentElement.setAttribute('data-rr-viewport-ready', 'true');
@@ -77,6 +80,29 @@
     doc.addEventListener('visibilitychange', function () { if (!doc.hidden) settle(); });
     ['gesturestart', 'gesturechange', 'gestureend', 'dblclick'].forEach(function (type) {
         doc.addEventListener(type, function (event) { event.preventDefault(); }, { passive: false });
+    });
+    // Compose mouse input uses offsetX/Y (already transformed by the browser),
+    // but its touch adapter subtracts the canvas bounding rect from clientX/Y.
+    // Supply the corresponding canvas-local coordinates for native touch input.
+    function mapTouches(event) {
+        if (!root.__rrRotated || !event.target || !/^(DIV|CANVAS)$/.test(event.target.tagName)) return;
+        var rect = app.getBoundingClientRect();
+        ['touches', 'targetTouches', 'changedTouches'].forEach(function (key) {
+            var list = Array.prototype.map.call(event[key], function (touch) {
+                return {
+                    identifier: touch.identifier, target: touch.target,
+                    clientX: rect.left + touch.clientY - rect.top,
+                    clientY: rect.top + rect.width - (touch.clientX - rect.left),
+                    pageX: touch.pageX, pageY: touch.pageY, screenX: touch.screenX, screenY: touch.screenY,
+                    radiusX: touch.radiusY, radiusY: touch.radiusX, rotationAngle: touch.rotationAngle, force: touch.force
+                };
+            });
+            list.item = function (index) { return list[index] || null; };
+            Object.defineProperty(event, key, { value: list });
+        });
+    }
+    ['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(function (type) {
+        app.addEventListener(type, mapTouches, { capture: true, passive: true });
     });
     fit();
     settle();

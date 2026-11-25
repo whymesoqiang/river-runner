@@ -8,6 +8,10 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.10
+- 首页显示版本，提示检查更新，保留记录和收藏。 | Show current version and explicit updates without deleting training data.
+- 手机竖排锁定时，页面内默认横屏并适配触控。 | Rotate the page in portrait phone viewports, including touch coordinates.
+
 ## 0.9
 - 长时间训练改用累计数据，避免每手重新计算全部历史。 | Update session HUD incrementally instead of rescanning every previous hand.
 - 历史记录复用编码，收藏和保存数量保持不变。 | Reuse encoded history rows while preserving favorites and retention rules.

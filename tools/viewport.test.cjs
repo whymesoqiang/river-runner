@@ -6,10 +6,11 @@ const source = fs.readFileSync(require('node:path').join(__dirname, '../web/src/
 const { measure } = require('../web/src/commonMain/resources/viewport.js');
 const env = (width, height) => ({ innerWidth: width, innerHeight: height, phone: true, insets: {} });
 
-test('iPhone portrait home-screen launch shows rotation prompt', () => {
+test('iPhone portrait home-screen launch rotates the page without requiring system unlock', () => {
     const r = measure({ ...env(390, 844), insets: { top: 47 } });
     assert.equal(r.rotate, true);
-    assert.equal(r.height, 797);
+    assert.equal(r.width, 797);
+    assert.equal(r.height, 390);
 });
 test('standalone rotation uses visual viewport even when inner dimensions are stale', () => {
     const r = measure({ ...env(390, 844), visualViewport: { width: 844, height: 390 }, insets: { left: 47 } });
@@ -19,15 +20,16 @@ test('standalone rotation uses visual viewport even when inner dimensions are st
 });
 test('visual viewport values are already CSS pixels and must not be scaled twice', () => {
     const r = measure({ ...env(844, 390), visualViewport: { width: 780, height: 1688, scale: 0.5 } });
-    assert.equal(r.width, 780);
-    assert.equal(r.height, 1688);
+    assert.equal(r.width, 1688);
+    assert.equal(r.height, 780);
 });
 test('iPad split view remains usable without phone rotation gate', () => {
     assert.equal(measure({ ...env(400, 800), phone: false }).rotate, false);
 });
 test('portrait -> landscape -> resume updates geometry, mounts once and stops polling', () => {
     let now = 0, seq = 0, callbacks = new Map(), events = {}, attrs = {}, classes = new Set();
-    const app = { style: {} };
+    const touches = {};
+    const app = { style: {}, addEventListener: (type, fn) => { touches[type] = fn; }, getBoundingClientRect: () => ({left: 0, top: 0, width: 390, height: 844}) };
     const on = (type, callback) => (events[type] ||= []).push(callback);
     const dispatch = (type) => (events[type] || []).forEach(fn => fn({ type }));
     const schedule = (fn, delay) => { callbacks.set(++seq, { fn, at: now + delay }); return seq; };
@@ -61,14 +63,23 @@ test('portrait -> landscape -> resume updates geometry, mounts once and stops po
     on('rr-viewport-ready', () => { if (!mounted) { mounted = true; mounts++; } });
     vm.runInNewContext(source, { window: w });
     advance(2000);
-    assert.equal(mounts, 0);
-    assert.ok(classes.has('rr-rotate'));
+    assert.equal(mounts, 1);
+    assert.equal(app.style.width, '844px');
+    assert.equal(app.style.transform, 'rotate(90deg)');
+    assert.ok(classes.has('rr-landscape'));
+    const touch = {identifier: 3, clientX: 253, clientY: 143, target: {tagName: 'DIV'}};
+    const event = {target: touch.target, touches: [touch], targetTouches: [touch], changedTouches: [touch]};
+    touches.touchstart(event);
+    assert.equal(event.changedTouches[0].clientX, 143);
+    assert.equal(event.changedTouches[0].clientY, 137);
+    assert.equal(event.changedTouches.item(0).identifier, 3);
+
     w.visualViewport.width = 844; w.visualViewport.height = 390;
     dispatch('orientationchange'); advance(2000);
     assert.equal(app.style.width, '844px'); assert.equal(app.style.height, '390px');
     assert.equal(mounts, 1); assert.equal(callbacks.size, 0);
     w.visualViewport.width = 390; w.visualViewport.height = 844;
-    dispatch('pageshow'); advance(2000); assert.ok(classes.has('rr-rotate'));
+    dispatch('pageshow'); advance(2000); assert.ok(classes.has('rr-landscape'));
     w.visualViewport.width = 844; w.visualViewport.height = 390;
     dispatch('visibilitychange'); advance(2000);
     assert.equal(app.style.width, '844px'); assert.equal(mounts, 1); assert.equal(callbacks.size, 0);

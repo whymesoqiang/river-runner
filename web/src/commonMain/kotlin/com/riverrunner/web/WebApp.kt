@@ -55,6 +55,9 @@ internal expect fun storageGet(key: String): String?
 /** False when the browser refused (storage full or blocked). */
 internal expect fun storageSet(key: String, value: String): Boolean
 internal expect fun storageRemove(key: String)
+internal expect fun webUpdateStatus(): String
+internal expect fun webCheckUpdates()
+internal expect fun webApplyUpdate()
 internal expect fun browserLanguage(): String
 internal expect fun playAudio(url: String, volume: Double, rate: Double)
 
@@ -112,6 +115,9 @@ private const val PREFIX = "rr."
 
 internal object WebPlatform : Platform {
     override suspend fun compute(request: String): String = backgroundCompute(request)
+    override fun updateStatus(): String = webUpdateStatus()
+    override fun checkUpdates() = webCheckUpdates()
+    override fun applyUpdate() = webApplyUpdate()
     override val settings: Settings = StorageSettings
     override val files: TextFiles = StorageFiles
     override val sound: SoundOut = AudioSound

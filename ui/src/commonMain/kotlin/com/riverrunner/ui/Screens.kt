@@ -96,6 +96,7 @@ fun HomeScreen(vm: AppViewModel) {
                     row.forEach { (label, go) -> NavItem(label, Modifier.weight(1f), onClick = go) }
                 }
             }
+            HomeVersion(vm)
         }
         // the "table" side of the lobby: the one place with felt
         Box(
@@ -724,3 +725,34 @@ private fun ToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Un
 
 @Suppress("unused")
 private val unusedColor = Color.Unspecified
+
+
+@Composable
+private fun HomeVersion(vm: AppViewModel) {
+    val zh = LocalStrings.current.isZh
+    var status by remember { mutableStateOf(vm.platform.updateStatus()) }
+    LaunchedEffect(vm) {
+        vm.platform.checkUpdates()
+        while (true) { status = vm.platform.updateStatus(); kotlinx.coroutines.delay(1500) }
+    }
+    val code = status?.substringBefore('|')
+    val newer = status?.substringAfter('|', "") ?: ""
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("v${vm.platform.appVersion}", color = Palette.TextDim, fontSize = 11.sp, modifier = Modifier.weight(1f))
+            if (status != null) SmallButton(if (code == "ready") (if (zh) "更新并重启" else "Update") else (if (zh) "检查更新" else "Check updates"),
+                { if (code == "ready") vm.platform.applyUpdate() else vm.platform.checkUpdates() }, highlight = code == "ready")
+        }
+        val text = when (code) {
+            "ready" -> if (zh) "新版 $newer 已就绪 · 保留记录和收藏" else "$newer ready · records stay saved"
+            "checking", "installing" -> if (zh) "正在检查或下载更新…" else "Checking / downloading…"
+            "latest" -> if (zh) "已确认是最新版本" else "Up to date"
+            "offline" -> if (zh) "当前离线，联网后可检查更新" else "Offline · check when connected"
+            "blocked" -> if (zh) "请先关闭其他训练窗口再更新" else "Close other training windows first"
+            "error" -> if (zh) "更新暂不可用，请稍后重试" else "Update unavailable · try again"
+            "applying" -> if (zh) "正在更新，请稍候…" else "Updating…"
+            else -> ""
+        }
+        if (text.isNotEmpty()) Text(text, color = if (code == "ready") Palette.Accent else Palette.TextDim, fontSize = 11.sp, lineHeight = 13.sp)
+    }
+}

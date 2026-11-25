@@ -34,21 +34,14 @@ jobs:
           python -m pip install fonttools==4.53.1
           python tools/check_web_fonts.py
       - name: Viewport regression tests
-        run: node --test tools/viewport.test.cjs tools/compute-worker.test.cjs tools/audio-player.test.cjs
+        run: node --test tools/viewport.test.cjs tools/compute-worker.test.cjs tools/audio-player.test.cjs tools/sw.test.cjs
       - name: Engine tests and web distribution
         run: ./gradlew :engine:jvmTest :web:composeCompatibilityBrowserDistribution --no-daemon
       - name: Version offline cache
         env:
           BUILD_SHA: ${{ github.sha }}
         run: |
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-          directory = Path('web/build/dist/composeWebCompatibility/productionExecutable')
-          worker = directory / 'sw.js'
-          worker.write_text(worker.read_text().replace('__RR_BUILD__', os.environ['BUILD_SHA']))
-          (directory / '.nojekyll').touch()
-          PY
+          python3 tools/prepare_web_release.py
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/build/dist/composeWebCompatibility/productionExecutable

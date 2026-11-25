@@ -21,3 +21,7 @@ internal actual fun playAudio(url: String, volume: Double, rate: Double) {
 internal actual fun workerSubmit(id: Int, payload: String) { js("window.rrCompute.submit")(id, payload) }
 internal actual fun workerPoll(id: Int): String? = js("window.rrCompute.poll")(id) as String?
 internal actual fun workerCancel(id: Int) { js("window.rrCompute.cancel")(id) }
+
+internal actual fun webUpdateStatus(): String = js("window.rrUpdates ? window.rrUpdates.state() : 'checking|'") as String
+internal actual fun webCheckUpdates() { js("window.rrUpdates && window.rrUpdates.check()") }
+internal actual fun webApplyUpdate() { js("window.rrUpdates && window.rrUpdates.apply()") }

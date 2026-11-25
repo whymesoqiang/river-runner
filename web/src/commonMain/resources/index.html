@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="rr-build" content="__RR_BUILD__">
+    <meta name="rr-version" content="__RR_VERSION__">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -24,21 +26,10 @@
         #loading b { color: #E6B54F; font-size: 18px; }
         #diag { font-size: 12px; line-height: 1.6; color: #6f7d75; max-width: 520px; word-break: break-all; }
         #diag .err { color: #F06A63; }
-        /* The app is laid out for landscape, as on Android: in portrait, ask to turn the phone
-           (under the loading screen, so download progress stays visible while loading). */
+        /* viewport.js rotates the complete app inside a portrait phone viewport. */
         /* the app draws into this; the overlays below stay outside it, so they can cover it */
         #app { position: fixed; left: 0; top: 0; width: 100%; height: 100%; touch-action: none; }
-        #rotate { display: none; position: fixed; inset: 0; z-index: 900; background: #0C1310; color: #EEF1EA;
-                  flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center;
-                  font: 17px -apple-system, "PingFang SC", sans-serif; padding: 24px; box-sizing: border-box; }
-        #rotate small { color: #9DAAA2; font-size: 13px; line-height: 1.6; }
-        #rotate .phone { width: 46px; height: 78px; border: 3px solid #E6B54F; border-radius: 9px;
-                         animation: rr-turn 2.4s ease-in-out 3 forwards; }
-        @keyframes rr-turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
-        /* shown only when turning the phone would help: a portrait window that fills the screen
-           (not split view on an unfolded phone or iPad, not a narrow desktop window; see fit()) */
-        html.rr-rotate #rotate { display: flex; }
-        html.rr-rotate #loading { display: none; }
+
     </style>
     <script>
         // Loading diagnostics: elapsed time, files being fetched, and any error, shown on the
@@ -186,15 +177,7 @@
                 addEventListener("pagehide", function () { __rrLog("页面被关闭或隐藏"); });
                 // Offline cache: after the first frame, so it never competes with the first download.
                 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-                    navigator.serviceWorker.register("sw.js").then(function (reg) {
-                        __rrLog(navigator.serviceWorker.controller ? "离线缓存已启用" : "离线缓存安装中，下次打开起可离线使用");
-                        // hand over the files this visit already downloaded
-                        var urls = [location.href].concat(performance.getEntriesByType("resource").map(function (e) { return e.name; }));
-                        var send = function (w) { if (w) w.postMessage({ type: "cache", urls: urls }); };
-                        var w = reg.installing || reg.waiting || reg.active;
-                        if (reg.active) send(reg.active);
-                        else if (w) w.addEventListener("statechange", function () { if (w.state === "activated") send(w); });
-                    }, function (e) { __rrLog("离线缓存不可用: " + e, true); });
+                    window.rrUpdates.start();
                 }
                 var l = el("loading"); if (l) l.remove();
             };
@@ -214,14 +197,10 @@
     <script src="viewport.js"></script>
     <script src="compute-worker.js"></script>
     <script src="audio-player.js"></script>
-    <div id="rotate">
-        <div class="phone"></div>
-        <div>请把手机横过来使用</div>
-        <small>Turn your phone sideways<br>如果转不过来，请在控制中心关闭“竖排方向锁定”</small>
-    </div>
+    <script src="updates.js"></script>
     <div id="loading">
         <b>River Runner 加载中…</b>
-        <div>已等待 <span id="secs">0</span> 秒，第一次打开需要下载约 5 MB，之后可以离线使用</div>
+        <div>已等待 <span id="secs">0</span> 秒，第一次打开需要下载应用资源，之后可以离线使用</div>
         <div id="slow" style="display:none">加载较慢，可能是网络连不上 GitHub，可以换个网络或稍后再试</div>
         <div id="diag"></div>
     </div>

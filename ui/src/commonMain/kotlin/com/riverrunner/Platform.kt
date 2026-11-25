@@ -15,6 +15,10 @@ interface Platform {
         com.riverrunner.engine.ComputeProtocol.run(request)
     }
 
+    fun updateStatus(): String? = null
+    fun checkUpdates() {}
+    fun applyUpdate() {}
+
     /** Small settings (the Android SharedPreferences file "river_runner"). */
     val settings: Settings
     /** Save slots and hand histories, stored as named text files. */
