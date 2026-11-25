@@ -34,7 +34,7 @@ jobs:
           python -m pip install fonttools==4.53.1
           python tools/check_web_fonts.py
       - name: Viewport regression tests
-        run: node --test tools/viewport.test.cjs tools/compute-worker.test.cjs
+        run: node --test tools/viewport.test.cjs tools/compute-worker.test.cjs tools/audio-player.test.cjs
       - name: Engine tests and web distribution
         run: ./gradlew :engine:jvmTest :web:composeCompatibilityBrowserDistribution --no-daemon
       - name: Version offline cache

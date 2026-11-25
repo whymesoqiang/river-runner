@@ -7,7 +7,7 @@ private fun jsStorageSet(k: String, v: String): Boolean = js("(function(){ try {
 private fun jsStorageRemove(k: String): Unit = js("(function(){ try { localStorage.removeItem(k); } catch (e) {} })()")
 private fun jsLanguage(): String = js("navigator.language || ''")
 private fun jsPlay(u: String, v: Double, r: Double): Unit =
-    js("(function(){ try { var a = new Audio(u); a.volume = v; a.playbackRate = r; var p = a.play(); if (p && p.catch) p.catch(function(){}); } catch (e) {} })()")
+    js("window.rrPlayAudio(u, v, r)")
 
 internal actual fun storageGet(key: String): String? = jsStorageGet(key)
 internal actual fun storageSet(key: String, value: String): Boolean = jsStorageSet(key, value)

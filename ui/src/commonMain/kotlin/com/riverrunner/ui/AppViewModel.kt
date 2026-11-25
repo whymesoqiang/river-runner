@@ -260,7 +260,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
     /** History id of the hand that just ended, so a late star still reaches it. */
     private var lastRecordId: Long? = null
     /** Hands of the current session (for the HUD and "replay last hand"). */
-    private val sessionRecords = ArrayList<HandRecord>()
+    private val sessionStats = com.riverrunner.engine.SeatStatsAccumulator()
     private var lastSessionRecord by mutableStateOf<HandRecord?>(null)
     private var hudStats: Map<Int, SeatStats> = emptyMap()
     private var tally = DeviationTally()
@@ -281,7 +281,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
         peeking = false
         starHand = false
         lastRecordId = null
-        sessionRecords.clear()
+        sessionStats.clear()
         lastSessionRecord = null
         hudStats = emptyMap()
         tally = DeviationTally()
@@ -523,9 +523,9 @@ class AppViewModel(val platform: Platform) : ViewModel() {
             val store = history
             withContext(IoDispatcher) { store.add(rec) }
             lastRecordId = rec.id
-            sessionRecords += rec
+            sessionStats.add(rec)
             lastSessionRecord = rec
-            hudStats = s.players.filter { !it.isHuman }.associate { it.seat to SeatStatsCalc.forSeat(sessionRecords, it.seat) }
+            hudStats = s.players.filter { !it.isHuman }.associate { it.seat to sessionStats.forSeat(it.seat) }
             if (handVerdicts.isNotEmpty()) {
                 val pos = Stats.positionOf(rec)
                 for ((street, v) in handVerdicts) tally = tally.add(street, pos, v)
@@ -570,7 +570,7 @@ class AppViewModel(val platform: Platform) : ViewModel() {
         sessionReport = SessionReport(
             tally,
             s.players.filter { !it.isHuman }.map { p ->
-                BotReveal(p.name, p.style, hudStats[p.seat] ?: SeatStatsCalc.forSeat(sessionRecords, p.seat))
+                BotReveal(p.name, p.style, hudStats[p.seat] ?: sessionStats.forSeat(p.seat))
             },
         )
         table = null

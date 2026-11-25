@@ -79,6 +79,35 @@ data class SeatStats(
     val af: Double?,
 )
 
+/** One session's HUD; keeps counters rather than retaining and rescanning all hands. */
+class SeatStatsAccumulator {
+    private class Counts {
+        var hands = 0; var vpip = 0; var pfr = 0; var aggression = 0; var calls = 0
+        fun snapshot() = SeatStats(hands, if (hands == 0) 0.0 else vpip.toDouble() / hands,
+            if (hands == 0) 0.0 else pfr.toDouble() / hands,
+            if (aggression == 0 && calls == 0) null else if (calls == 0) aggression.toDouble() else aggression.toDouble() / calls)
+    }
+    private val seats = mutableMapOf<Int, Counts>()
+    fun clear() = seats.clear()
+    fun add(record: HandRecord) {
+        for (p in record.players) {
+            val c = seats.getOrPut(p.seat) { Counts() }
+            c.hands++
+            var voluntary = false; var raised = false
+            for (a in record.actions) {
+                if (a.seat != p.seat || a.type.isPost) continue
+                if (a.street == Street.PREFLOP) {
+                    if (a.type == ActionType.CALL || a.type.isAggressive) voluntary = true
+                    if (a.type.isAggressive) raised = true
+                } else if (a.type.isAggressive) c.aggression++ else if (a.type == ActionType.CALL) c.calls++
+            }
+            if (voluntary) c.vpip++
+            if (raised) c.pfr++
+        }
+    }
+    fun forSeat(seat: Int): SeatStats = seats[seat]?.snapshot() ?: SeatStats(0, 0.0, 0.0, null)
+}
+
 object SeatStatsCalc {
     /** HUD numbers for [seat] over the hands it was dealt into. */
     fun forSeat(records: List<HandRecord>, seat: Int): SeatStats {

@@ -8,6 +8,11 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.9
+- 长时间训练改用累计数据，避免每手重新计算全部历史。 | Update session HUD incrementally instead of rescanning every previous hand.
+- 历史记录复用编码，收藏和保存数量保持不变。 | Reuse encoded history rows while preserving favorites and retention rules.
+- 复用音效资源并限制数量，切到后台时释放资源。 | Bound and reuse audio players and release them when backgrounded.
+
 ## 0.8
 - 网页将策略、复盘胜率及成就计算移到单一后台线程，切换复盘时取消过期任务。 | Run web calculations in one cancellable background worker.
 - 每手结束默认停在结算帧，展示公共牌、底池获胜者和净收益，保留操作记录入口。 | Open each hand review at settlement, with board, pot recipients, net results and action history.

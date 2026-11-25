@@ -256,27 +256,35 @@ class ProfileStore(private val files: TextFiles, private val prefs: Prefs?, priv
 class HistoryStore(private val files: TextFiles, private val file: String) {
     private val records = ArrayList<HandRecord>()
     private val lock = Any()
+    // Records are immutable. Encode each hand once, rather than encoding the entire
+    // archive again on every hand after the retention limit is reached.
+    private val encoded = ArrayList<String>()
+    private var nonFavorites = 0
 
     companion object { const val LIMIT = 1000 }
 
     init {
-        files.read(file)?.lineSequence()?.forEach { line -> HandRecord.decode(line)?.let { records += it } }
+        files.read(file)?.lineSequence()?.forEach { line -> HandRecord.decode(line)?.let { records += it; encoded += line + "\n"; if (!it.favorite) nonFavorites++ } }
     }
 
     fun all(): List<HandRecord> = locked(lock) { records.toList() }
 
     fun add(r: HandRecord): Unit = locked(lock) {
         records += r
-        val nonFav = records.count { !it.favorite }
+        encoded += r.encode() + "\n"
+        if (!r.favorite) nonFavorites++
+        val nonFav = nonFavorites
         if (nonFav > LIMIT) {
             var drop = nonFav - LIMIT
             val iter = records.iterator()
+            var index = 0
             while (iter.hasNext() && drop > 0) {
-                if (!iter.next().favorite) { iter.remove(); drop-- }
+                val old = iter.next()
+                if (!old.favorite) { encoded.removeAt(index); iter.remove(); drop--; nonFavorites-- } else index++
             }
             rewrite()
         } else {
-            files.append(file, r.encode() + "\n")
+            files.append(file, encoded.last())
         }
     }
 
@@ -285,6 +293,8 @@ class HistoryStore(private val files: TextFiles, private val file: String) {
         if (i < 0) return@locked null
         val updated = records[i].copy(favorite = !records[i].favorite)
         records[i] = updated
+        nonFavorites += if (updated.favorite) -1 else 1
+        encoded[i] = updated.encode() + "\n"
         rewrite()
         updated
     }
@@ -294,18 +304,21 @@ class HistoryStore(private val files: TextFiles, private val file: String) {
         if (i < 0) return@locked null
         if (records[i].favorite == value) return@locked records[i]
         records[i] = records[i].copy(favorite = value)
+        nonFavorites += if (value) -1 else 1
+        encoded[i] = records[i].encode() + "\n"
         rewrite()
         records[i]
     }
 
     fun clearNonFavorites(): Unit = locked(lock) {
-        records.removeAll { !it.favorite }
+        for (i in records.indices.reversed()) if (!records[i].favorite) { records.removeAt(i); encoded.removeAt(i) }
+        nonFavorites = 0
         rewrite()
     }
 
     fun count(): Int = locked(lock) { records.size }
 
     private fun rewrite() {
-        files.write(file, records.joinToString("") { it.encode() + "\n" })
+        files.write(file, encoded.joinToString(""))
     }
 }
