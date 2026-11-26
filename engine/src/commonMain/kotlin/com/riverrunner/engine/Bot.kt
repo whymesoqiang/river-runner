@@ -468,8 +468,12 @@ object Bot {
         // Only public information and this player's own cards enter this branch.
         if (style.shortStackPushBB > 0 && effBB <= style.shortStackPushBB && la.canRaise) {
             val price = if (raises == 0) 1.0 else (5.0 / (la.currentBet.toDouble() / bb).coerceAtLeast(5.0)).pow(0.5)
-            val width = (pushWidth(effBB.coerceAtMost(20.0), behind) * style.looseness * price /
+            var width = (pushWidth(effBB.coerceAtMost(20.0), behind) * style.looseness * price /
                 (1.0 + raises * 0.65)).coerceIn(0.025, 0.65)
+            if (raises > 0 && style.shortReshove > 0 && engine.players.none { it.allIn && !it.folded }) {
+                val reshovePrice = (9.0 / (la.currentBet.toDouble() / bb).coerceAtLeast(9.0)).pow(.9)
+                width = max(width, style.shortReshove * reshovePrice * (if (behind >= 4) .85 else 1.0))
+            }
             val push = smooth(pct, width, 0.025)
             opts += Move.raiseTo(la.maxRaiseTo) to push
             val flatWidth = style.shortStackFlat * (1.0 - la.toCall.toDouble() / max(1, me.stack + me.streetBet) / 0.15).coerceIn(0.0, 1.0)
@@ -580,7 +584,7 @@ object Bot {
                 // Deep cash personas defend a normal live open beyond generic tight chart cutoffs.
                 // Discount the extra width for expensive opens, shallow stacks and poor position.
                 if (style.defendOpen > 0) {
-                    val price = (5.0 / (lastRaise.streetTotal.toDouble() / bb).coerceAtLeast(5.0)).pow(0.8)
+                    val price = (style.openComfortBB / (lastRaise.streetTotal.toDouble() / bb).coerceAtLeast(style.openComfortBB)).pow(0.9)
                     val depth = (effBB / 80.0).coerceIn(0.0, 1.0)
                     val position = if (ip || isBB) 1.0 else 0.85
                     val width = style.defendOpen * price * depth * position * (if (callersAfterRaise > 0) 0.9 else 1.0)
@@ -602,8 +606,8 @@ object Bot {
                 opts += Move.FOLD to (1 - p3 - pCall).coerceAtLeast(0.0)
             }
             2 -> {
-                val fourBet: Double
-                val callTop: Double
+                var fourBet: Double
+                var callTop: Double
                 if (iWasRaiser) {
                     fourBet = max(0.02, raiserWidth * 0.33) * style.aggression
                     callTop = max(0.06, raiserWidth * (if (ip) 1.05 else 0.8)) * style.preflopCall
@@ -611,6 +615,18 @@ object Bot {
                     fourBet = 0.02 * style.aggression
                     callTop = 0.04 * style.preflopCall
                 }
+                if (style.defendThreeBet > 0) {
+                    val invested = acts.any { it.seat == seat && it.type == ActionType.CALL }
+                    val base = when { iWasRaiser -> style.defendThreeBet; invested -> style.defendThreeBet * .85; else -> style.coldThreeBet }
+                    val price = (9.0 / (lastRaise.streetTotal.toDouble() / bb).coerceAtLeast(9.0)).pow(.9)
+                    val depth = (effBB / 100.0).coerceIn(0.0, 1.0)
+                    val position = if (ip) 1.0 else .85
+                    val width = base * price * depth * position * (if (callersAfterRaise > 0) .9 else 1.0)
+                    callTop = max(callTop, width)
+                    // Most added defense is calling; aggression still distinguishes the personas.
+                    fourBet = max(fourBet, width * (if (iWasRaiser) .10 else .06) * style.aggression)
+                }
+                callTop = callTop.coerceIn(fourBet, .85)
                 explain("价值 4-bet 范围中心为前 ${pctText(fourBet)}，跟注范围中心为前 ${pctText(callTop)}；是否为原加注者影响防守范围。", "Value 4-bet midpoint top ${pctText(fourBet)}, calling midpoint top ${pctText(callTop)}; being the original raiser changes the defense range.")
                 val pValue = smooth(pct, fourBet, 0.006)
                 val pBluff = if (iWasRaiser && isSuitedWheelAce(me.hole)) 0.3 * style.bluff else 0.0

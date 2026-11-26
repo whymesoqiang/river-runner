@@ -1,0 +1,3934 @@
+{
+  "date": "2026-11-26",
+  "baselineCommit": "dd6db752182fb6f18ac0b25d04fa356542bed90b",
+  "method": "8 seats; public profile buy-in depths; opens and cold responses use 1000 random deals per persona/size. Original-raiser responses are weighted by that persona choosing to raise; short-stack Britney original-raiser rows are omitted in final probes because she shoves rather than opening to 3 BB. Whole-table probes condition on a non-Britney star opening 3 BB, then the hero reraises to the stated total. They measure whether every opponent folds before any continuation, not complete-hand winnings.",
+  "baseline": {
+    "probes": [
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.21671632059908158",
+        "call": "0.6568679617815462",
+        "raise": "0.12641571761937234"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.46109348163611785",
+        "call": "0.44455637104851137",
+        "raise": "0.09435014731537071"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5095404762770765",
+        "call": "0.40111875226386084",
+        "raise": "0.08934077145906255"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.678240086325581",
+        "call": "0.25120489175823146",
+        "raise": "0.07055502191618737"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.810661028937644",
+        "call": "0.12813687402163926",
+        "raise": "0.06120209704071666"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9267729712949275",
+        "call": "0.04828998109810786",
+        "raise": "0.02493704760696436"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9267729712949275",
+        "call": "0.04828998109810786",
+        "raise": "0.02493704760696436"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9267729712949275",
+        "call": "0.04828998109810786",
+        "raise": "0.02493704760696436"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9267729712949275",
+        "call": "0.04828998109810786",
+        "raise": "0.02493704760696436"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9267729712949275",
+        "call": "0.04828998109810786",
+        "raise": "0.02493704760696436"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3456881299497649",
+        "call": "0.5116203788592536",
+        "raise": "0.14269149119098143"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.5438214945248019",
+        "call": "0.35210679162101644",
+        "raise": "0.10407171385418179"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5829074979144101",
+        "call": "0.31392352534969487",
+        "raise": "0.10316897673589542"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7284051436452184",
+        "call": "0.19467717284963995",
+        "raise": "0.07691768350514201"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8304841096595494",
+        "call": "0.08519320862676863",
+        "raise": "0.08432268171368172"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7854575740729772",
+        "call": "0.11769354436198937",
+        "raise": "0.09684888156503317"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7854575740729772",
+        "call": "0.11769354436198937",
+        "raise": "0.09684888156503317"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7854575740729772",
+        "call": "0.11769354436198937",
+        "raise": "0.09684888156503317"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7854575740729772",
+        "call": "0.11769354436198937",
+        "raise": "0.09684888156503317"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7854575740729772",
+        "call": "0.11769354436198937",
+        "raise": "0.09684888156503317"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9471021375921309",
+        "call": "0.02066019933463779",
+        "raise": "0.03223766307323094"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9471021375921309",
+        "call": "0.02066019933463779",
+        "raise": "0.03223766307323094"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9471021375921309",
+        "call": "0.02066019933463779",
+        "raise": "0.03223766307323094"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9471021375921309",
+        "call": "0.02066019933463779",
+        "raise": "0.03223766307323094"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9471021375921309",
+        "call": "0.02066019933463779",
+        "raise": "0.03223766307323094"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8639834329008416",
+        "call": "7.181411650302155E-4",
+        "raise": "0.13529842593412833"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8900590121745792",
+        "call": "0.0",
+        "raise": "0.10994098782542118"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8955573790753512",
+        "call": "0.0",
+        "raise": "0.10444262092464902"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9172519840693082",
+        "call": "0.0",
+        "raise": "0.08274801593069213"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9812411706559923",
+        "call": "0.01875882934400745",
+        "raise": "0.0"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.6076418951181612",
+        "call": "0.0",
+        "raise": "0.39235810488183825"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.6644018240595717",
+        "call": "0.0",
+        "raise": "0.3355981759404283"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.6768893993222506",
+        "call": "0.0",
+        "raise": "0.3231106006777487"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.709603689368829",
+        "call": "0.0",
+        "raise": "0.29039631063117083"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.611214007573005",
+        "call": "0.38878599242699435",
+        "raise": "0.0"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.899150966988039",
+        "call": "0.0",
+        "raise": "0.10084903301196081"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9185978032911015",
+        "call": "0.0",
+        "raise": "0.0814021967088991"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9227734254186503",
+        "call": "0.0",
+        "raise": "0.07722657458134932"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9382971287448247",
+        "call": "0.0",
+        "raise": "0.061702871255174936"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9951023890276254",
+        "call": "0.004897610972374765",
+        "raise": "0.0"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.47007600502563024",
+        "call": "0.3809603080739732",
+        "raise": "0.14896368690039652"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.513560316842142",
+        "call": "0.34572039223534307",
+        "raise": "0.14071929092251512"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.684876483923363",
+        "call": "0.217600144508616",
+        "raise": "0.0975233715680205"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8103991645515268",
+        "call": "0.09994466653008512",
+        "raise": "0.08965616891838794"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7796060303640701",
+        "call": "0.1341093995799563",
+        "raise": "0.08628457005597316"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7796060303640701",
+        "call": "0.1341093995799563",
+        "raise": "0.08628457005597316"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7796060303640701",
+        "call": "0.1341093995799563",
+        "raise": "0.08628457005597316"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7796060303640701",
+        "call": "0.1341093995799563",
+        "raise": "0.08628457005597316"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7796060303640701",
+        "call": "0.1341093995799563",
+        "raise": "0.08628457005597316"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9326654331005402",
+        "call": "0.02569472888434652",
+        "raise": "0.04163983801511327"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9326654331005402",
+        "call": "0.02569472888434652",
+        "raise": "0.04163983801511327"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9326654331005402",
+        "call": "0.02569472888434652",
+        "raise": "0.04163983801511327"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9326654331005402",
+        "call": "0.02569472888434652",
+        "raise": "0.04163983801511327"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9326654331005402",
+        "call": "0.02569472888434652",
+        "raise": "0.04163983801511327"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.4769361139385805",
+        "call": "0.3991503754274737",
+        "raise": "0.12391351063394543"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.6393604801002557",
+        "call": "0.2648671006232619",
+        "raise": "0.09577241927648256"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.6761571399544929",
+        "call": "0.23624530024166301",
+        "raise": "0.08759755980384389"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7827064170080225",
+        "call": "0.14098019574145793",
+        "raise": "0.07631338725051993"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8623854977095325",
+        "call": "0.05599868808609242",
+        "raise": "0.08161581420437494"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8175560611900908",
+        "call": "0.07845743281133293",
+        "raise": "0.10398650599857559"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8175560611900908",
+        "call": "0.07845743281133293",
+        "raise": "0.10398650599857559"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8175560611900908",
+        "call": "0.07845743281133293",
+        "raise": "0.10398650599857559"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8175560611900908",
+        "call": "0.07845743281133293",
+        "raise": "0.10398650599857559"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8175560611900908",
+        "call": "0.07845743281133293",
+        "raise": "0.10398650599857559"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9513132064716503",
+        "call": "0.012748569373634536",
+        "raise": "0.03593822415471458"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9513132064716503",
+        "call": "0.012748569373634536",
+        "raise": "0.03593822415471458"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9513132064716503",
+        "call": "0.012748569373634536",
+        "raise": "0.03593822415471458"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9513132064716503",
+        "call": "0.012748569373634536",
+        "raise": "0.03593822415471458"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9513132064716503",
+        "call": "0.012748569373634536",
+        "raise": "0.03593822415471458"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5077353508061744",
+        "call": "0.3764278041188351",
+        "raise": "0.11583684507499056"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.6618489210288181",
+        "call": "0.2425144231571498",
+        "raise": "0.0956366558140319"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.6997117607086056",
+        "call": "0.21893097925048108",
+        "raise": "0.08135726004091307"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7917217842730354",
+        "call": "0.1274869295480013",
+        "raise": "0.08079128617896333"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8608085609700578",
+        "call": "0.05351004691009059",
+        "raise": "0.08568139211985118"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7600966067106762",
+        "call": "0.13231222318307884",
+        "raise": "0.10759117010624515"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7600966067106762",
+        "call": "0.13231222318307884",
+        "raise": "0.10759117010624515"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7600966067106762",
+        "call": "0.13231222318307884",
+        "raise": "0.10759117010624515"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7600966067106762",
+        "call": "0.13231222318307884",
+        "raise": "0.10759117010624515"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7600966067106762",
+        "call": "0.13231222318307884",
+        "raise": "0.10759117010624515"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9474673173854105",
+        "call": "0.021665912736581805",
+        "raise": "0.030866769878007957"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9474673173854105",
+        "call": "0.021665912736581805",
+        "raise": "0.030866769878007957"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9474673173854105",
+        "call": "0.021665912736581805",
+        "raise": "0.030866769878007957"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9474673173854105",
+        "call": "0.021665912736581805",
+        "raise": "0.030866769878007957"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9474673173854105",
+        "call": "0.021665912736581805",
+        "raise": "0.030866769878007957"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5125347857590328",
+        "call": "0.3634599193127117",
+        "raise": "0.12400529492825564"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.6670748284880403",
+        "call": "0.23690793168407723",
+        "raise": "0.09601723982788213"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7026235724141213",
+        "call": "0.21361394904675982",
+        "raise": "0.08376247853911893"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7953694417862722",
+        "call": "0.1224547642526289",
+        "raise": "0.08217579396109852"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8679296975928777",
+        "call": "0.04621062535111306",
+        "raise": "0.08585967705600954"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7741912448195735",
+        "call": "0.10871703799233433",
+        "raise": "0.11709171718809254"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7741912448195735",
+        "call": "0.10871703799233433",
+        "raise": "0.11709171718809254"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7741912448195735",
+        "call": "0.10871703799233433",
+        "raise": "0.11709171718809254"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7741912448195735",
+        "call": "0.10871703799233433",
+        "raise": "0.11709171718809254"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7741912448195735",
+        "call": "0.10871703799233433",
+        "raise": "0.11709171718809254"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9473885801617736",
+        "call": "0.015602377797651081",
+        "raise": "0.03700904204057547"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9473885801617736",
+        "call": "0.015602377797651081",
+        "raise": "0.03700904204057547"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9473885801617736",
+        "call": "0.015602377797651081",
+        "raise": "0.03700904204057547"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9473885801617736",
+        "call": "0.015602377797651081",
+        "raise": "0.03700904204057547"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9473885801617736",
+        "call": "0.015602377797651081",
+        "raise": "0.03700904204057547"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.6929064099797162",
+        "call": "0.22073578242842748",
+        "raise": "0.08635780759185617"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7839015762172342",
+        "call": "0.13440763718874194",
+        "raise": "0.08169078659402404"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8024854922539726",
+        "call": "0.11632014912852473",
+        "raise": "0.08119435861750222"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.855973959339349",
+        "call": "0.057013117343333676",
+        "raise": "0.08701292331731775"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8912518143734591",
+        "call": "0.022212496376967768",
+        "raise": "0.0865356892495728"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7390696410175217",
+        "call": "0.09100255666149659",
+        "raise": "0.16992780232098148"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7390696410175217",
+        "call": "0.09100255666149659",
+        "raise": "0.16992780232098148"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7390696410175217",
+        "call": "0.09100255666149659",
+        "raise": "0.16992780232098148"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7390696410175217",
+        "call": "0.09100255666149659",
+        "raise": "0.16992780232098148"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7390696410175217",
+        "call": "0.09100255666149659",
+        "raise": "0.16992780232098148"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9524681193396279",
+        "call": "0.009321179151265225",
+        "raise": "0.03821070150910605"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9524681193396279",
+        "call": "0.009321179151265225",
+        "raise": "0.03821070150910605"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9524681193396279",
+        "call": "0.009321179151265225",
+        "raise": "0.03821070150910605"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9524681193396279",
+        "call": "0.009321179151265225",
+        "raise": "0.03821070150910605"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9524681193396279",
+        "call": "0.009321179151265225",
+        "raise": "0.03821070150910605"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.44675714262077004",
+        "call": "0.4592443565036936",
+        "raise": "0.09399850087553627"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.49910736873270467",
+        "call": "0.414802496581359",
+        "raise": "0.08609013468593636"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.6673809738993702",
+        "call": "0.25987461673145557",
+        "raise": "0.0727444093691747"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7844937955685415",
+        "call": "0.15534660363309502",
+        "raise": "0.06015960079836318"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.9123741097933337",
+        "call": "0.06395511741566519",
+        "raise": "0.023670772791001687"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.9123741097933337",
+        "call": "0.06395511741566519",
+        "raise": "0.023670772791001687"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.9123741097933337",
+        "call": "0.06395511741566519",
+        "raise": "0.023670772791001687"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9123741097933337",
+        "call": "0.06395511741566519",
+        "raise": "0.023670772791001687"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9123741097933337",
+        "call": "0.06395511741566519",
+        "raise": "0.023670772791001687"
+      }
+    ],
+    "table": [
+      {
+        "total_bb": "8",
+        "hands": "1000",
+        "all_fold": "506"
+      },
+      {
+        "total_bb": "9",
+        "hands": "1000",
+        "all_fold": "508"
+      },
+      {
+        "total_bb": "30",
+        "hands": "1000",
+        "all_fold": "538"
+      }
+    ]
+  },
+  "round1": {
+    "probes": [
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.21671632059908158",
+        "call": "0.6568679617815462",
+        "raise": "0.12641571761937234"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.21671632059908158",
+        "call": "0.6568679617815462",
+        "raise": "0.12641571761937234"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.29792048817596384",
+        "call": "0.5859995172169415",
+        "raise": "0.11607999460709449"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5502038108592586",
+        "call": "0.365579908195497",
+        "raise": "0.08421628094524425"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7644398239097243",
+        "call": "0.17649364192475403",
+        "raise": "0.05906653416552187"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5520142998400451",
+        "call": "0.3850078383707732",
+        "raise": "0.0629778617891814"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8562203194654763",
+        "call": "0.11895486895033601",
+        "raise": "0.02482481158418777"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9211241033561623",
+        "call": "0.05396984209528757",
+        "raise": "0.0249060545485501"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3456881299497649",
+        "call": "0.5116203788592536",
+        "raise": "0.14269149119098143"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3456881299497649",
+        "call": "0.5116203788592536",
+        "raise": "0.14269149119098143"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.40397356723099836",
+        "call": "0.4592877586153266",
+        "raise": "0.13673867415367502"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.6227752903341374",
+        "call": "0.27967226357566305",
+        "raise": "0.0975524460901997"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7959866209722246",
+        "call": "0.12649334417377345",
+        "raise": "0.07752003485400126"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5125776578021808",
+        "call": "0.3909234701720975",
+        "raise": "0.0964988720257212"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7270101916547007",
+        "call": "0.17628769079852621",
+        "raise": "0.09670211754677277"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8922038080360137",
+        "call": "0.07568091992853287",
+        "raise": "0.03211527203545327"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9382089029893231",
+        "call": "0.029626130430069928",
+        "raise": "0.03216496658060682"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8314133182262913",
+        "call": "0.0",
+        "raise": "0.16858668177370903"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8453922525359735",
+        "call": "0.0",
+        "raise": "0.15460774746402617"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8472950482392612",
+        "call": "0.0",
+        "raise": "0.1527049517607384"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8960621526323593",
+        "call": "0.0",
+        "raise": "0.1039378473676405"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9812411706559923",
+        "call": "0.01875882934400745",
+        "raise": "0.0"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.11263497805378961",
+        "call": "0.0",
+        "raise": "0.8873650219462098"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.11263497805378961",
+        "call": "0.0",
+        "raise": "0.8873650219462098"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.11263497805378961",
+        "call": "0.0",
+        "raise": "0.8873650219462098"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.339754573880536",
+        "call": "0.0",
+        "raise": "0.6602454261194646"
+      },
+      {
+        "id": "britney",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.611214007573005",
+        "call": "0.38878599242699435",
+        "raise": "0.0"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8484842230602195",
+        "call": "0.0",
+        "raise": "0.15151577693978005"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8557362443462141",
+        "call": "0.0",
+        "raise": "0.14426375565378582"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8566383917808728",
+        "call": "0.0",
+        "raise": "0.143361608219127"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9064890601723578",
+        "call": "0.0",
+        "raise": "0.09351093982764172"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9951023890276254",
+        "call": "0.004897610972374765",
+        "raise": "0.0"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5095897529762711",
+        "call": "0.3484024523507272",
+        "raise": "0.1420077946730019"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7383879249826938",
+        "call": "0.1713605319593403",
+        "raise": "0.09025154305796615"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5603824659376029",
+        "call": "0.34812483641339187",
+        "raise": "0.09149269764900624"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7354663905958592",
+        "call": "0.1783798619594126",
+        "raise": "0.08615374744472798"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8193133958317211",
+        "call": "0.13921652010251948",
+        "raise": "0.041470084065759624"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9035927048614207",
+        "call": "0.0548900952797542",
+        "raise": "0.04151719985882504"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.4769361139385805",
+        "call": "0.3991503754274737",
+        "raise": "0.12391351063394543"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.532756148019187",
+        "call": "0.35576412321549267",
+        "raise": "0.11147972876532015"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5791916318587471",
+        "call": "0.317535127896163",
+        "raise": "0.10327324024508937"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7382681213785133",
+        "call": "0.1849435828335925",
+        "raise": "0.07678829578789435"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8493789547375494",
+        "call": "0.0704581764323949",
+        "raise": "0.08016286883005518"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5389162346377565",
+        "call": "0.35730366664417",
+        "raise": "0.10378009871807373"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7527604257005837",
+        "call": "0.143287291062664",
+        "raise": "0.10395228323675192"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9098754896040139",
+        "call": "0.054469892008403915",
+        "raise": "0.03565461838758261"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.944933805517025",
+        "call": "0.019191344961494522",
+        "raise": "0.035874849521480415"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5077353508061744",
+        "call": "0.3764278041188351",
+        "raise": "0.11583684507499056"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.5077353508061744",
+        "call": "0.3764278041188351",
+        "raise": "0.11583684507499056"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5537711632690672",
+        "call": "0.33753478562300354",
+        "raise": "0.10869405110792903"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7232245362471221",
+        "call": "0.19684465553406",
+        "raise": "0.07993080821881839"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.833140035203686",
+        "call": "0.07835485366783115",
+        "raise": "0.08850511112848279"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.43627264923886216",
+        "call": "0.4561849853517624",
+        "raise": "0.10754236540937546"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6737064300636482",
+        "call": "0.2187560767565259",
+        "raise": "0.10753749317982614"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8804209989832729",
+        "call": "0.08886184394284971",
+        "raise": "0.030717157073877715"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9331944060320055",
+        "call": "0.03596763687150324",
+        "raise": "0.030837957096491557"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5125347857590328",
+        "call": "0.3634599193127117",
+        "raise": "0.12400529492825564"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.5384564039314793",
+        "call": "0.34590591709614066",
+        "raise": "0.11563767897237986"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5825875336994428",
+        "call": "0.30585553703096674",
+        "raise": "0.11155692926959053"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7405200954519006",
+        "call": "0.17844250325359012",
+        "raise": "0.08103740129450931"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.847688240445523",
+        "call": "0.06597421119413888",
+        "raise": "0.0863375483603379"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5218086588377776",
+        "call": "0.36133440540106326",
+        "raise": "0.11685693576115877"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7442803601887983",
+        "call": "0.13880746468924637",
+        "raise": "0.11691217512195587"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9155335701635029",
+        "call": "0.04747182350511146",
+        "raise": "0.03699460633138612"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9459227786361962",
+        "call": "0.01706030833655835",
+        "raise": "0.037016913027245364"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.6929064099797162",
+        "call": "0.22073578242842748",
+        "raise": "0.08635780759185617"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7415025539320115",
+        "call": "0.17733308345805884",
+        "raise": "0.08116436260993"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7684758718333587",
+        "call": "0.15191015849981138",
+        "raise": "0.07961396966682963"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8406464888836671",
+        "call": "0.07177181496945471",
+        "raise": "0.08758169614687798"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8903371236442535",
+        "call": "0.022597576094481833",
+        "raise": "0.08706530026126437"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.3777450219603977",
+        "call": "0.4526963232862884",
+        "raise": "0.16955865475331375"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6752390949098251",
+        "call": "0.15469492178769034",
+        "raise": "0.1700659833024843"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9261245325008564",
+        "call": "0.035685187829896686",
+        "raise": "0.038190279669247075"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9500881893816248",
+        "call": "0.011743670646091019",
+        "raise": "0.038168139972284194"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.49126459872613826",
+        "call": "0.41825777708448186",
+        "raise": "0.09047762418937978"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7299089344793483",
+        "call": "0.20887242292406585",
+        "raise": "0.06121864259658583"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.388865094501829",
+        "call": "0.5337609958931928",
+        "raise": "0.07737390960497846"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.80749758105082",
+        "call": "0.16886788937127212",
+        "raise": "0.023634529577908653"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8972327032959142",
+        "call": "0.079120577622085",
+        "raise": "0.023646719082000868"
+      }
+    ],
+    "table": [
+      {
+        "total_bb": "8",
+        "hands": "1000",
+        "all_fold": "66"
+      },
+      {
+        "total_bb": "9",
+        "hands": "1000",
+        "all_fold": "66"
+      },
+      {
+        "total_bb": "30",
+        "hands": "1000",
+        "all_fold": "485"
+      }
+    ],
+    "completeHands": [
+      {
+        "id": "peter",
+        "hands": "778",
+        "vpip": "406",
+        "pfr": "161",
+        "first_open_opportunities": "371",
+        "fold_to_open": "120",
+        "three_bet": "45",
+        "air_bet_opportunities": "193",
+        "air_bets": "19",
+        "late_air_opportunities": "90",
+        "late_air_bets": "10"
+      },
+      {
+        "id": "dwan",
+        "hands": "773",
+        "vpip": "360",
+        "pfr": "174",
+        "first_open_opportunities": "370",
+        "fold_to_open": "144",
+        "three_bet": "63",
+        "air_bet_opportunities": "138",
+        "air_bets": "22",
+        "late_air_opportunities": "46",
+        "late_air_bets": "9"
+      },
+      {
+        "id": "britney",
+        "hands": "780",
+        "vpip": "149",
+        "pfr": "117",
+        "first_open_opportunities": "388",
+        "fold_to_open": "309",
+        "three_bet": "71",
+        "air_bet_opportunities": "5",
+        "air_bets": "0",
+        "late_air_opportunities": "0",
+        "late_air_bets": "0"
+      },
+      {
+        "id": "texas_mike",
+        "hands": "778",
+        "vpip": "481",
+        "pfr": "239",
+        "first_open_opportunities": "397",
+        "fold_to_open": "125",
+        "three_bet": "87",
+        "air_bet_opportunities": "207",
+        "air_bets": "29",
+        "late_air_opportunities": "95",
+        "late_air_bets": "9"
+      },
+      {
+        "id": "wang_ye",
+        "hands": "748",
+        "vpip": "286",
+        "pfr": "157",
+        "first_open_opportunities": "332",
+        "fold_to_open": "162",
+        "three_bet": "47",
+        "air_bet_opportunities": "111",
+        "air_bets": "15",
+        "late_air_opportunities": "46",
+        "late_air_bets": "5"
+      },
+      {
+        "id": "tan_xuan",
+        "hands": "793",
+        "vpip": "285",
+        "pfr": "147",
+        "first_open_opportunities": "362",
+        "fold_to_open": "200",
+        "three_bet": "36",
+        "air_bet_opportunities": "125",
+        "air_bets": "29",
+        "late_air_opportunities": "53",
+        "late_air_bets": "15"
+      },
+      {
+        "id": "wesley",
+        "hands": "791",
+        "vpip": "280",
+        "pfr": "152",
+        "first_open_opportunities": "367",
+        "fold_to_open": "194",
+        "three_bet": "53",
+        "air_bet_opportunities": "107",
+        "air_bets": "26",
+        "late_air_opportunities": "40",
+        "late_air_bets": "13"
+      },
+      {
+        "id": "st_wang",
+        "hands": "788",
+        "vpip": "190",
+        "pfr": "112",
+        "first_open_opportunities": "361",
+        "fold_to_open": "245",
+        "three_bet": "46",
+        "air_bet_opportunities": "74",
+        "air_bets": "12",
+        "late_air_opportunities": "30",
+        "late_air_bets": "4"
+      },
+      {
+        "id": "keating",
+        "hands": "771",
+        "vpip": "470",
+        "pfr": "194",
+        "first_open_opportunities": "372",
+        "fold_to_open": "99",
+        "three_bet": "48",
+        "air_bet_opportunities": "236",
+        "air_bets": "24",
+        "late_air_opportunities": "114",
+        "late_air_bets": "10"
+      },
+      {
+        "id": "hero",
+        "hands": "1000",
+        "vpip": "123",
+        "pfr": "83",
+        "first_open_opportunities": "457",
+        "fold_to_open": "393",
+        "three_bet": "25",
+        "air_bet_opportunities": "54",
+        "air_bets": "5",
+        "late_air_opportunities": "19",
+        "late_air_bets": "0"
+      }
+    ]
+  },
+  "holdout": {
+    "seed": 726830,
+    "probes": [
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.21671632059908158",
+        "call": "0.6568679617815462",
+        "raise": "0.12641571761937234"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.21671632059908158",
+        "call": "0.6568679617815462",
+        "raise": "0.12641571761937234"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.29792048817596384",
+        "call": "0.5859995172169415",
+        "raise": "0.11607999460709449"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5502038108592586",
+        "call": "0.365579908195497",
+        "raise": "0.08421628094524425"
+      },
+      {
+        "id": "peter",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7644398239097243",
+        "call": "0.17649364192475403",
+        "raise": "0.05906653416552187"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3107893320301279",
+        "call": "0.6028043775504699",
+        "raise": "0.08640629041940175"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5520142998400451",
+        "call": "0.3850078383707732",
+        "raise": "0.0629778617891814"
+      },
+      {
+        "id": "peter",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7139341578744071",
+        "call": "0.22312228654493418",
+        "raise": "0.06294355558065887"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7723834447707575",
+        "call": "0.2027923039359999",
+        "raise": "0.024824251293242224"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8562203194654763",
+        "call": "0.11895486895033601",
+        "raise": "0.02482481158418777"
+      },
+      {
+        "id": "peter",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9211241033561623",
+        "call": "0.05396984209528757",
+        "raise": "0.0249060545485501"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3456881299497649",
+        "call": "0.5116203788592536",
+        "raise": "0.14269149119098143"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3456881299497649",
+        "call": "0.5116203788592536",
+        "raise": "0.14269149119098143"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.40397356723099836",
+        "call": "0.4592877586153266",
+        "raise": "0.13673867415367502"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.6227752903341374",
+        "call": "0.27967226357566305",
+        "raise": "0.0975524460901997"
+      },
+      {
+        "id": "dwan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7959866209722246",
+        "call": "0.12649334417377345",
+        "raise": "0.07752003485400126"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.27682604163700053",
+        "call": "0.6051312537720024",
+        "raise": "0.11804270459099668"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5125776578021808",
+        "call": "0.3909234701720975",
+        "raise": "0.0964988720257212"
+      },
+      {
+        "id": "dwan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7270101916547007",
+        "call": "0.17628769079852621",
+        "raise": "0.09670211754677277"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8282251224354193",
+        "call": "0.1396757506249634",
+        "raise": "0.03209912693961749"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8922038080360137",
+        "call": "0.07568091992853287",
+        "raise": "0.03211527203545327"
+      },
+      {
+        "id": "dwan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9382089029893231",
+        "call": "0.029626130430069928",
+        "raise": "0.03216496658060682"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8314133182262913",
+        "call": "0.0",
+        "raise": "0.16858668177370903"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8453922525359735",
+        "call": "0.0",
+        "raise": "0.15460774746402617"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8472950482392612",
+        "call": "0.0",
+        "raise": "0.1527049517607384"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8960621526323593",
+        "call": "0.0",
+        "raise": "0.1039378473676405"
+      },
+      {
+        "id": "britney",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9812411706559923",
+        "call": "0.01875882934400745",
+        "raise": "0.0"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8484842230602195",
+        "call": "0.0",
+        "raise": "0.15151577693978005"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8557362443462141",
+        "call": "0.0",
+        "raise": "0.14426375565378582"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8566383917808728",
+        "call": "0.0",
+        "raise": "0.143361608219127"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9064890601723578",
+        "call": "0.0",
+        "raise": "0.09351093982764172"
+      },
+      {
+        "id": "britney",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9951023890276254",
+        "call": "0.004897610972374765",
+        "raise": "0.0"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.23097264965580822",
+        "call": "0.5738383572699207",
+        "raise": "0.19518899307427073"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5095897529762711",
+        "call": "0.3484024523507272",
+        "raise": "0.1420077946730019"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7383879249826938",
+        "call": "0.1713605319593403",
+        "raise": "0.09025154305796615"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3028705523244241",
+        "call": "0.5603230725904166",
+        "raise": "0.13680637508516005"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5603824659376029",
+        "call": "0.34812483641339187",
+        "raise": "0.09149269764900624"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7354663905958592",
+        "call": "0.1783798619594126",
+        "raise": "0.08615374744472798"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7200559299188567",
+        "call": "0.2384740863387743",
+        "raise": "0.04146998374236933"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8193133958317211",
+        "call": "0.13921652010251948",
+        "raise": "0.041470084065759624"
+      },
+      {
+        "id": "texas_mike",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9035927048614207",
+        "call": "0.0548900952797542",
+        "raise": "0.04151719985882504"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.4769361139385805",
+        "call": "0.3991503754274737",
+        "raise": "0.12391351063394543"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.532756148019187",
+        "call": "0.35576412321549267",
+        "raise": "0.11147972876532015"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5791916318587471",
+        "call": "0.317535127896163",
+        "raise": "0.10327324024508937"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7382681213785133",
+        "call": "0.1849435828335925",
+        "raise": "0.07678829578789435"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8493789547375494",
+        "call": "0.0704581764323949",
+        "raise": "0.08016286883005518"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3253646902991852",
+        "call": "0.5572607700944993",
+        "raise": "0.11737453960631594"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5389162346377565",
+        "call": "0.35730366664417",
+        "raise": "0.10378009871807373"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7527604257005837",
+        "call": "0.143287291062664",
+        "raise": "0.10395228323675192"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8576694852168614",
+        "call": "0.10673137996731441",
+        "raise": "0.035599134815824066"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9098754896040139",
+        "call": "0.054469892008403915",
+        "raise": "0.03565461838758261"
+      },
+      {
+        "id": "wang_ye",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.944933805517025",
+        "call": "0.019191344961494522",
+        "raise": "0.035874849521480415"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5077353508061744",
+        "call": "0.3764278041188351",
+        "raise": "0.11583684507499056"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.5077353508061744",
+        "call": "0.3764278041188351",
+        "raise": "0.11583684507499056"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5537711632690672",
+        "call": "0.33753478562300354",
+        "raise": "0.10869405110792903"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7232245362471221",
+        "call": "0.19684465553406",
+        "raise": "0.07993080821881839"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.833140035203686",
+        "call": "0.07835485366783115",
+        "raise": "0.08850511112848279"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.15669268129433322",
+        "call": "0.7054545435389035",
+        "raise": "0.13785277516676384"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.43627264923886216",
+        "call": "0.4561849853517624",
+        "raise": "0.10754236540937546"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6737064300636482",
+        "call": "0.2187560767565259",
+        "raise": "0.10753749317982614"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8095043134976383",
+        "call": "0.159783377023706",
+        "raise": "0.03071230947865585"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8804209989832729",
+        "call": "0.08886184394284971",
+        "raise": "0.030717157073877715"
+      },
+      {
+        "id": "tan_xuan",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9331944060320055",
+        "call": "0.03596763687150324",
+        "raise": "0.030837957096491557"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.5125347857590328",
+        "call": "0.3634599193127117",
+        "raise": "0.12400529492825564"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.5384564039314793",
+        "call": "0.34590591709614066",
+        "raise": "0.11563767897237986"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.5825875336994428",
+        "call": "0.30585553703096674",
+        "raise": "0.11155692926959053"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.7405200954519006",
+        "call": "0.17844250325359012",
+        "raise": "0.08103740129450931"
+      },
+      {
+        "id": "wesley",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.847688240445523",
+        "call": "0.06597421119413888",
+        "raise": "0.0863375483603379"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.3067321335754292",
+        "call": "0.566448154534642",
+        "raise": "0.12681971188992802"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.5218086588377776",
+        "call": "0.36133440540106326",
+        "raise": "0.11685693576115877"
+      },
+      {
+        "id": "wesley",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7442803601887983",
+        "call": "0.13880746468924637",
+        "raise": "0.11691217512195587"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.8675708063392271",
+        "call": "0.09550569466886201",
+        "raise": "0.03692349899191167"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9155335701635029",
+        "call": "0.04747182350511146",
+        "raise": "0.03699460633138612"
+      },
+      {
+        "id": "wesley",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9459227786361962",
+        "call": "0.01706030833655835",
+        "raise": "0.037016913027245364"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.6929064099797162",
+        "call": "0.22073578242842748",
+        "raise": "0.08635780759185617"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7415025539320115",
+        "call": "0.17733308345805884",
+        "raise": "0.08116436260993"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7684758718333587",
+        "call": "0.15191015849981138",
+        "raise": "0.07961396966682963"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.8406464888836671",
+        "call": "0.07177181496945471",
+        "raise": "0.08758169614687798"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8903371236442535",
+        "call": "0.022597576094481833",
+        "raise": "0.08706530026126437"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.12131091389317418",
+        "call": "0.7091756292572409",
+        "raise": "0.1695134568495852"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.3777450219603977",
+        "call": "0.4526963232862884",
+        "raise": "0.16955865475331375"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6752390949098251",
+        "call": "0.15469492178769034",
+        "raise": "0.1700659833024843"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.886213065490766",
+        "call": "0.0757178220720508",
+        "raise": "0.03806911243718315"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.9261245325008564",
+        "call": "0.035685187829896686",
+        "raise": "0.038190279669247075"
+      },
+      {
+        "id": "st_wang",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.9500881893816248",
+        "call": "0.011743670646091019",
+        "raise": "0.038168139972284194"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.19767231543653715",
+        "call": "0.6802044361777282",
+        "raise": "0.12212324838573431"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.49126459872613826",
+        "call": "0.41825777708448186",
+        "raise": "0.09047762418937978"
+      },
+      {
+        "id": "keating",
+        "scenario": "open",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.7299089344793483",
+        "call": "0.20887242292406585",
+        "raise": "0.06121864259658583"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.04957547784660923",
+        "call": "0.835348021602957",
+        "raise": "0.11507650055043435"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.388865094501829",
+        "call": "0.5337609958931928",
+        "raise": "0.07737390960497846"
+      },
+      {
+        "id": "keating",
+        "scenario": "opener",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.6060706437417198",
+        "call": "0.3244219254360963",
+        "raise": "0.06950743082218348"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "5",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "8",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "9",
+        "samples": "1000",
+        "fold": "0.7026917600468674",
+        "call": "0.2736737219897968",
+        "raise": "0.023634517963335818"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "15",
+        "samples": "1000",
+        "fold": "0.80749758105082",
+        "call": "0.16886788937127212",
+        "raise": "0.023634529577908653"
+      },
+      {
+        "id": "keating",
+        "scenario": "cold",
+        "total_bb": "30",
+        "samples": "1000",
+        "fold": "0.8972327032959142",
+        "call": "0.079120577622085",
+        "raise": "0.023646719082000868"
+      }
+    ],
+    "table": [
+      {
+        "total_bb": "8",
+        "hands": "1000",
+        "all_fold": "69"
+      },
+      {
+        "total_bb": "9",
+        "hands": "1000",
+        "all_fold": "69"
+      },
+      {
+        "total_bb": "30",
+        "hands": "1000",
+        "all_fold": "507"
+      }
+    ],
+    "completeHands": [
+      {
+        "id": "peter",
+        "hands": "782",
+        "vpip": "459",
+        "pfr": "175",
+        "first_open_opportunities": "399",
+        "fold_to_open": "115",
+        "three_bet": "37",
+        "air_bet_opportunities": "214",
+        "air_bets": "21",
+        "late_air_opportunities": "94",
+        "late_air_bets": "10"
+      },
+      {
+        "id": "dwan",
+        "hands": "795",
+        "vpip": "379",
+        "pfr": "153",
+        "first_open_opportunities": "405",
+        "fold_to_open": "160",
+        "three_bet": "52",
+        "air_bet_opportunities": "152",
+        "air_bets": "19",
+        "late_air_opportunities": "60",
+        "late_air_bets": "10"
+      },
+      {
+        "id": "britney",
+        "hands": "766",
+        "vpip": "147",
+        "pfr": "110",
+        "first_open_opportunities": "395",
+        "fold_to_open": "323",
+        "three_bet": "63",
+        "air_bet_opportunities": "8",
+        "air_bets": "1",
+        "late_air_opportunities": "4",
+        "late_air_bets": "0"
+      },
+      {
+        "id": "texas_mike",
+        "hands": "785",
+        "vpip": "472",
+        "pfr": "235",
+        "first_open_opportunities": "397",
+        "fold_to_open": "127",
+        "three_bet": "84",
+        "air_bet_opportunities": "218",
+        "air_bets": "46",
+        "late_air_opportunities": "88",
+        "late_air_bets": "17"
+      },
+      {
+        "id": "wang_ye",
+        "hands": "772",
+        "vpip": "267",
+        "pfr": "141",
+        "first_open_opportunities": "377",
+        "fold_to_open": "211",
+        "three_bet": "45",
+        "air_bet_opportunities": "118",
+        "air_bets": "22",
+        "late_air_opportunities": "48",
+        "late_air_bets": "10"
+      },
+      {
+        "id": "tan_xuan",
+        "hands": "789",
+        "vpip": "304",
+        "pfr": "150",
+        "first_open_opportunities": "375",
+        "fold_to_open": "205",
+        "three_bet": "31",
+        "air_bet_opportunities": "144",
+        "air_bets": "30",
+        "late_air_opportunities": "66",
+        "late_air_bets": "22"
+      },
+      {
+        "id": "wesley",
+        "hands": "767",
+        "vpip": "268",
+        "pfr": "160",
+        "first_open_opportunities": "337",
+        "fold_to_open": "195",
+        "three_bet": "42",
+        "air_bet_opportunities": "116",
+        "air_bets": "23",
+        "late_air_opportunities": "47",
+        "late_air_bets": "12"
+      },
+      {
+        "id": "st_wang",
+        "hands": "788",
+        "vpip": "169",
+        "pfr": "102",
+        "first_open_opportunities": "374",
+        "fold_to_open": "262",
+        "three_bet": "51",
+        "air_bet_opportunities": "49",
+        "air_bets": "7",
+        "late_air_opportunities": "17",
+        "late_air_bets": "1"
+      },
+      {
+        "id": "keating",
+        "hands": "756",
+        "vpip": "453",
+        "pfr": "181",
+        "first_open_opportunities": "382",
+        "fold_to_open": "105",
+        "three_bet": "39",
+        "air_bet_opportunities": "207",
+        "air_bets": "17",
+        "late_air_opportunities": "92",
+        "late_air_bets": "6"
+      },
+      {
+        "id": "hero",
+        "hands": "1000",
+        "vpip": "141",
+        "pfr": "86",
+        "first_open_opportunities": "449",
+        "fold_to_open": "366",
+        "three_bet": "30",
+        "air_bet_opportunities": "69",
+        "air_bets": "9",
+        "late_air_opportunities": "28",
+        "late_air_bets": "4"
+      }
+    ]
+  },
+  "limitations": "These are training persona adjustments, not measured real-player fold-to-3-bet frequencies. Fixed probes reuse identical deals for comparisons; complete hands and whole-table holdout use a different seed. No opponent private cards are inputs to policy decisions."
+}

@@ -8,6 +8,10 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.12
+- 明星桌分别调整开池、再加注和冷跟范围，面对八到九个大盲的再加注不再过度弃牌。 | Separate star opening, 3-bet defense and cold-call ranges to prevent excessive folds against 8–9 BB reraises.
+- 根据已有投入、筹码深度与加注价格决定是否继续，保留短码全下及各选手差异。 | Account for prior investment, stack depth and price while preserving short-stack shoves and individual styles.
+
 ## 0.11
 - 小屏八人桌为公共牌保留空间，避免两侧手牌遮挡。 | Reserve board space on compact eight-player tables.
 - 明星桌调整入池与防守范围，区分正常加注和超大加注，增加择机偷鸡。 | Calibrate star participation, price-sensitive defense and selective probes.
