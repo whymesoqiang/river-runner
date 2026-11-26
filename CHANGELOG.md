@@ -8,6 +8,10 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.14
+- 更新显示已完成和总文件数，区分检查、下载和超时，网络恢复后可重试。 | Show completed/total update files and distinct checking, downloading and timeout states with retry.
+- 限制下载等待时间，并行下载及自动重试，保留旧版、训练记录和收藏。 | Bound download waits, download concurrently and retry while preserving the previous app and saved training data.
+
 ## 0.13
 - 明星桌按翻前、翻牌、转牌和河牌分别微调，保留短码推牌、宽跟注及持续施压的差异。 | Tune star personas across all four streets, preserving short-stack shoves, sticky calls and sustained pressure.
 - 修复低频下注被尺寸拆分后过滤的问题，大尺寸下注同时包含价值牌与诈唬。 | Preserve low-frequency bets across sizing mixes and include both value and bluffs in polarized sizes.

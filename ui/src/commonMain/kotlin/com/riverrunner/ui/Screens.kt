@@ -736,7 +736,8 @@ private fun HomeVersion(vm: AppViewModel) {
         while (true) { status = vm.platform.updateStatus(); kotlinx.coroutines.delay(1500) }
     }
     val code = status?.substringBefore('|')
-    val newer = status?.substringAfter('|', "") ?: ""
+    val newer = status?.split('|')?.getOrNull(1) ?: ""
+    val progress = status?.split('|')?.getOrNull(2) ?: ""
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("v${vm.platform.appVersion}", color = Palette.TextDim, fontSize = 11.sp, modifier = Modifier.weight(1f))
@@ -745,7 +746,9 @@ private fun HomeVersion(vm: AppViewModel) {
         }
         val text = when (code) {
             "ready" -> if (zh) "新版 $newer 已就绪 · 保留记录和收藏" else "$newer ready · records stay saved"
-            "checking", "installing" -> if (zh) "正在检查或下载更新…" else "Checking / downloading…"
+            "checking" -> if (zh) "正在检查新版本…" else "Checking for a new version…"
+            "installing" -> if (progress.isEmpty()) (if (zh) "正在准备下载 $newer…" else "Preparing $newer…") else (if (zh) "下载 $newer · 已完成 $progress 文件" else "Downloading $newer · $progress files complete")
+            "timeout" -> if (zh) "更新超时，请检查网络后重试；记录已保留" else "Update timed out · check connection and retry; records saved"
             "latest" -> if (zh) "已确认是最新版本" else "Up to date"
             "offline" -> if (zh) "当前离线，联网后可检查更新" else "Offline · check when connected"
             "blocked" -> if (zh) "请先关闭其他训练窗口再更新" else "Close other training windows first"
