@@ -379,13 +379,17 @@ object Bot {
         return mults to w
     }
 
-    private fun normalized(opts: List<Pair<Move, Double>>): List<Pair<Move, Double>> {
+    private fun normalized(opts: List<Pair<Move, Double>>, preserveSizes: Boolean = false): List<Pair<Move, Double>> {
         val merged = LinkedHashMap<Move, Double>()
         for ((m, p) in opts) if (p > 0) merged[m] = (merged[m] ?: 0.0) + p
         val total = merged.values.sum()
         if (total <= 0) return listOf(Move.CHECK to 1.0)
         // drop tiny frequencies to keep play clean
-        val cleaned = merged.filter { it.value / total >= 0.03 }
+        // A 10% bet split across five sizes must not disappear because each size is <3%.
+        // Keep meaningful action types intact for star personas; ordinary tables retain their mix.
+        val typeMass = if (preserveSizes) merged.entries.groupBy { it.key.type }
+            .mapValues { (_, entries) -> entries.sumOf { it.value } } else emptyMap()
+        val cleaned = merged.filter { (if (preserveSizes) typeMass.getValue(it.key.type) else it.value) / total >= 0.03 }
         val t2 = cleaned.values.sum()
         return cleaned.map { it.key to it.value / t2 }
     }
@@ -533,7 +537,7 @@ object Bot {
                 return Policy(normalized(opts), null, 0.0, null, reasons = reasons, summary = summary)
             }
             var thr = max(rfiWidth(behind, hu) * style.looseness, style.openFloor)
-            if (limpers > 0) thr *= 0.65
+            if (limpers > 0) thr *= style.isolateLimpers
             explain("无人加注时，开池范围中心为前 ${pctText(thr)}；位置越靠后通常范围越宽，有跛入时收紧。起手牌越强于该门槛，加注频率越高。", "Unraised pot: opening-range midpoint top ${pctText(thr)}. Later positions usually open wider; limpers tighten the range. Hands stronger than the midpoint raise more often.")
             summary = PolicyReason(if (pct < thr) "手牌达到当前位置的开池门槛，主动加注争取底池。" else "手牌未达到当前位置的开池门槛，避免投入更多筹码。",
                 if (pct < thr) "This hand meets the opening threshold for this position." else "This hand falls below the opening threshold for this position.")
@@ -592,6 +596,9 @@ object Bot {
                     threeBet = max(threeBet, width * 0.13 * style.aggression)
                 }
                 callTop = callTop.coerceIn(threeBet, 0.85)
+                // Persona-specific 3-bet pressure is distinct from flat-call looseness.
+                threeBet = (threeBet * style.threeBetPressure).coerceAtMost(.65)
+                callTop = max(callTop, threeBet)
                 explain("价值 3-bet 范围中心为前 ${pctText(threeBet)}，跟注范围上界中心为前 ${pctText(callTop)}；部分同花边缘牌和同花小 A 会加入诈唬加注。", "Value 3-bet midpoint top ${pctText(threeBet)}, call-range cutoff midpoint top ${pctText(callTop)}; some marginal suited hands and suited wheel aces add bluff raises.")
                 val pValue = smooth(pct, threeBet, 0.008)
                 var pBluff = 0.0
@@ -677,7 +684,13 @@ object Bot {
         val prevAggressor = engine.actions.lastOrNull { it.street == prevStreet && it.type.isAggressive }?.seat
         val initiative = prevAggressor == seat
         val opts = ArrayList<Pair<Move, Double>>()
-        val multi = if (nOpp >= 2) 0.35 else 1.0
+        val persona = style.postflop
+        val multi = if (nOpp >= 2) persona?.multiwayBluff ?: 0.35 else 1.0
+        val pressure = when (street) {
+            Street.FLOP -> persona?.flopPressure
+            Street.TURN -> persona?.turnPressure
+            else -> persona?.riverPressure
+        } ?: 1.0
         val reasons = mutableListOf(PolicyReason(
             "面对 $nOpp 名对手，按公开行动估计范围，模拟胜率 ${pctText(eq)}；相对均分底池份额为 ${number(rel)} 倍。SPR ${number(spr)}，${if (ip) "有位置" else "无位置"}，牌面湿度 ${number(wet)}（越高听牌越多）。",
             "Against $nOpp opponents' ranges inferred from public actions, simulated equity is ${pctText(eq)} (${number(rel)} times an equal pot share). SPR ${number(spr)}, ${if (ip) "in position" else "out of position"}, board wetness ${number(wet)} (higher means more draws)."
@@ -703,6 +716,7 @@ object Bot {
             if (rel < valueThr) {
                 val bluff: Double = when {
                     cls == 1 && street != Street.RIVER -> 0.5
+                    persona != null && initiative && street == Street.FLOP && nOpp >= 2 -> 0.28
                     initiative && street == Street.FLOP && nOpp == 1 -> if (wet < 0.3) 0.65 else if (wet < 0.6) 0.45 else 0.3
                     initiative && street == Street.TURN && nOpp == 1 -> if (cls == 0) 0.3 else 0.15
                     initiative && street == Street.RIVER && nOpp == 1 -> if (cls == 0) 0.22 else 0.05
@@ -713,7 +727,7 @@ object Bot {
                 // Limit probes to heads-up air/draws; avoid turning showdown hands into random bluffs.
                 val probe = if (nOpp == 1 && ip && !initiative && cls <= 1) style.probe * (1.0 - wet * 0.35) else 0.0
                 val medium = if (cls == 2 || cls == 3) 0.6 else 1.0  // medium hands prefer pot control
-                pBet = max(pBet, max(probe, bluff * style.bluff * multi * medium * (if (street == Street.TURN || street == Street.RIVER) style.lateBarrel else 1.0)))
+                pBet = max(pBet, max(probe, bluff * style.bluff * pressure * multi * medium * (if (street == Street.TURN || street == Street.RIVER) style.lateBarrel else 1.0)))
             }
             val cap = if (style.probe > 0 && cls == 0 && street != Street.FLOP) 0.78 else 0.97
             pBet = pBet.coerceIn(0.0, cap)
@@ -723,6 +737,17 @@ object Bot {
                 val vShare = (pValue / max(1e-9, pBet)).coerceIn(0.0, 1.0)
                 val wV = betSizeWeights(true, wet, street, nOpp)
                 val wB = betSizeWeights(false, wet, street, nOpp)
+                // Polarize both strong value and bluffs, never only value (a sizing tell).
+                // Limit large mixes to heads-up late streets with room behind.
+                val polar = if (nOpp == 1 && street != Street.FLOP && spr >= 2.0 &&
+                    (cls <= 1 || rel > 1.6)) persona?.polarSize ?: 0.0 else 0.0
+                if (polar > 0) {
+                    val target = doubleArrayOf(.05, .10, .25, .25, .35)
+                    for (i in wV.indices) {
+                        wV[i] = wV[i] * (1 - polar) + target[i] * polar
+                        wB[i] = wB[i] * (1 - polar) + target[i] * polar
+                    }
+                }
                 for (size in SizeClass.entries) {
                     val i = size.ordinal
                     val w = vShare * wV[i] + (1 - vShare) * wB[i]
@@ -737,7 +762,7 @@ object Bot {
                 else -> PolicyReason("利用听牌或位置与主动权，以诈唬争取弃牌。", "Draws, position or initiative support a bluff to generate folds.")
             }
             opts += Move.CHECK to (1 - pBet)
-            return Policy(normalized(opts), eq, 0.0, null, reasons = reasons, summary = summary)
+            return Policy(normalized(opts, preserveSizes = persona != null), eq, 0.0, null, reasons = reasons, summary = summary)
         }
 
         // ---------------- facing a bet
@@ -756,7 +781,7 @@ object Bot {
         var pRaise = 0.0
         var pValueRaise = 0.0
         if (la.canRaise) {
-            pRaise = above(rel, raiseThr, 0.05) * min(1.0, 0.65 * style.aggression)
+            pRaise = above(rel, raiseThr, 0.05) * min(1.0, 0.65 * style.aggression * (persona?.valueRaise ?: 1.0))
             if (cls == 4 && street == Street.FLOP && wet < 0.3) pRaise *= 0.6
             pValueRaise = pRaise
             val bluffRaise = when {
@@ -764,7 +789,7 @@ object Bot {
                 cls == 1 && street == Street.TURN -> 0.06
                 cls == 0 && street == Street.RIVER -> 0.03
                 else -> 0.0
-            } * style.bluff * multi
+            } * style.bluff * multi * (persona?.semiRaise ?: 1.0)
             if (rel < raiseThr) pRaise = max(pRaise, bluffRaise)
         }
         var pCall = above(eqEff - req, 0.0, 0.03)
@@ -792,6 +817,6 @@ object Bot {
             pCall >= 1 - pRaise - pCall -> PolicyReason("调整后胜率或小注防守规则支持跟注继续。", "Adjusted equity or the small-bet defense rule supports calling.")
             else -> PolicyReason("调整后胜率不足以覆盖跟注门槛，倾向弃牌。", "Adjusted equity falls short of the calling threshold, favoring a fold.")
         }
-        return Policy(normalized(opts), eq, potOdds, icm, reasons = reasons, summary = summary)
+        return Policy(normalized(opts, preserveSizes = persona != null), eq, potOdds, icm, reasons = reasons, summary = summary)
     }
 }

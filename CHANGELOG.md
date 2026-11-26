@@ -8,6 +8,11 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.13
+- 明星桌按翻前、翻牌、转牌和河牌分别微调，保留短码推牌、宽跟注及持续施压的差异。 | Tune star personas across all four streets, preserving short-stack shoves, sticky calls and sustained pressure.
+- 修复低频下注被尺寸拆分后过滤的问题，大尺寸下注同时包含价值牌与诈唬。 | Preserve low-frequency bets across sizing mixes and include both value and bluffs in polarized sizes.
+- 增加百万手对局审计、独立种子复验和连续训练回归，检查合法行动与筹码守恒。 | Add million-hand audits, independent-seed validation and continuous-session regression for legal actions and chip conservation.
+
 ## 0.12
 - 明星桌分别调整开池、再加注和冷跟范围，面对八到九个大盲的再加注不再过度弃牌。 | Separate star opening, 3-bet defense and cold-call ranges to prevent excessive folds against 8–9 BB reraises.
 - 根据已有投入、筹码深度与加注价格决定是否继续，保留短码全下及各选手差异。 | Account for prior investment, stack depth and price while preserving short-stack shoves and individual styles.
