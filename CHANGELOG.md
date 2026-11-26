@@ -8,6 +8,11 @@ One section per version, newest first. Each line is `Chinese | English`.
 CI takes the version from the top section (`## 0.4` builds 0.4.x) and copies that section into
 the GitHub release notes; the in-app "What's new" reads this file too.
 
+## 0.11
+- 小屏八人桌为公共牌保留空间，避免两侧手牌遮挡。 | Reserve board space on compact eight-player tables.
+- 明星桌调整入池与防守范围，区分正常加注和超大加注，增加择机偷鸡。 | Calibrate star participation, price-sensitive defense and selective probes.
+- 听牌计算复用位运算，减少临时对象和计算开销。 | Use rank masks and lookup tables to reduce draw-calculation allocations.
+
 ## 0.10
 - 首页显示版本，提示检查更新，保留记录和收藏。 | Show current version and explicit updates without deleting training data.
 - 手机竖排锁定时，页面内默认横屏并适配触控。 | Rotate the page in portrait phone viewports, including touch coordinates.

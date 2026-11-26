@@ -38,7 +38,8 @@ class StarTableTest {
         assertTrue(pd.reasons.none { it.en.contains("shove midpoint") })
     }
     @Test fun personalitiesActuallyChangeActionDistributions() {
-        val e=hand()
+        // Both now play ordinary suited hands; very weak suited hands still separate their openings.
+        val e=hand("7s2s")
         fun raising(id:String) = Bot.decide(e,0,BotStyle.GTO,Random(12),personality=StarProfiles.byId(id))
             .options.filter { it.first.type == MoveType.RAISE }.sumOf { it.second }
         assertTrue(raising("texas_mike") > raising("wesley") + .1)
@@ -90,4 +91,28 @@ class StarTableTest {
         }
         assertFailsWith<IllegalArgumentException> { GameSession(SessionConfig(GameMode.TOURNAMENT,6,100,TableType.STARS)) }
     }
+    @Test fun normalLiveOpensGetDefenseButLargeRaisesStillGetRespect() {
+        for(star in StarProfiles.all) {
+            fun foldRate(size:Int):Double = (0 until 250).sumOf { i ->
+                val r=Random(419+i);val target=listOf(4,5,6,7,0,1,2)[i%7]
+                val e=HandEngine(HandSetup(50,100,0,0,(0..7).map { SeatSetup(it,"P$it",if(it==target) (star.minBB+star.maxBB)/2*100 else 30000) }),RandomCardSource(r))
+                e.apply(Move.raiseTo(size*100));while(e.toAct!=target)e.apply(Move.FOLD)
+                Bot.decide(e,target,star.baseStyle,r,personality=star).probability(MoveType.FOLD)
+            }/250
+            val small=foldRate(5);val large=foldRate(15)
+            if(star.traits.defendOpen>0 && star.traits.shortStackPushBB==0.0) assertTrue(small<.8,"${star.id}: $small")
+            assertTrue(large>small+.025,"${star.id}: $small -> $large")
+            if(star.id in listOf("peter","texas_mike","keating"))assertTrue(small<.5,star.id)
+        }
+    }
+    @Test fun tanXuanAttacksMissedCbetWithoutAutomaticBarreling() {
+        val e=hand("JdTs")
+        e.apply(Move.CALL);e.apply(Move.raiseTo(300));e.apply(Move.FOLD);e.apply(Move.CALL)
+        e.dealNextStreet();e.apply(Move.CHECK)
+        val p=Bot.decide(e,0,BotStyle.GTO,Random(51),personality=StarProfiles.byId("tan_xuan"))
+        val base=Bot.decide(e,0,BotStyle.GTO,Random(51))
+        assertTrue(p.probability(MoveType.RAISE)>base.probability(MoveType.RAISE)+.15)
+        assertTrue(p.probability(MoveType.CHECK)>.1)
+    }
+
 }

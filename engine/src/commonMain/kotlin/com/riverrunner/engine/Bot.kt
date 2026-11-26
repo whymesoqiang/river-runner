@@ -224,25 +224,24 @@ object Bot {
     /** Rough count of outs to a flush or straight (only draws using a hole card). */
     fun drawOuts(hole: IntArray, board: List<Int>): Int {
         var outs = 0
-        val cards = board + hole.toList()
-        for (s in 0 until 4) {
-            val cnt = cards.count { Cards.suit(it) == s }
-            if (cnt == 4 && hole.any { Cards.suit(it) == s }) outs += 9
+        // Rank/suit masks avoid allocating up to 26 temporary sets for every sampled hand.
+        var boardRanks = 0
+        var ranks = 0
+        val holeSuits = (1 shl Cards.suit(hole[0])) or (1 shl Cards.suit(hole[1]))
+        var suits = 0 // four 4-bit counters, enough for a seven-card hand
+        for (c in board) {
+            boardRanks = boardRanks or (1 shl Cards.rank(c))
+            suits += 1 shl (Cards.suit(c) * 4)
         }
-        val ranks = cards.map { Cards.rank(it) }.toSet()
-        val boardRanks = board.map { Cards.rank(it) }.toSet()
-        fun hasStraight(rs: Set<Int>): Boolean {
-            var m = 0
-            for (r in rs) m = m or (1 shl r)
-            if (m and ((1 shl 12) or 0xF) == ((1 shl 12) or 0xF)) return true
-            for (hi in 4..12) { val need = 0x1F shl (hi - 4); if (m and need == need) return true }
-            return false
-        }
-        if (!hasStraight(ranks)) {
+        ranks = boardRanks or (1 shl Cards.rank(hole[0])) or (1 shl Cards.rank(hole[1]))
+        for (c in hole) suits += 1 shl (Cards.suit(c) * 4)
+        for (suit in 0..3) if ((suits ushr (suit * 4)) and 15 == 4 && holeSuits and (1 shl suit) != 0) outs += 9
+        if (!HandEvaluator.hasStraightRanks(ranks)) {
             var straightRanks = 0
             for (r in 0..12) {
-                if (r in ranks) continue
-                if (hasStraight(ranks + r) && !hasStraight(boardRanks + r)) straightRanks++
+                val bit = 1 shl r
+                if (ranks and bit != 0) continue
+                if (HandEvaluator.hasStraightRanks(ranks or bit) && !HandEvaluator.hasStraightRanks(boardRanks or bit)) straightRanks++
             }
             outs += min(straightRanks, 2) * 4
         }
@@ -468,12 +467,16 @@ object Bot {
         // A short-stack persona changes action selection, not just the displayed label.
         // Only public information and this player's own cards enter this branch.
         if (style.shortStackPushBB > 0 && effBB <= style.shortStackPushBB && la.canRaise) {
-            val width = (pushWidth(effBB.coerceAtMost(20.0), behind) * style.looseness /
+            val price = if (raises == 0) 1.0 else (5.0 / (la.currentBet.toDouble() / bb).coerceAtLeast(5.0)).pow(0.5)
+            val width = (pushWidth(effBB.coerceAtMost(20.0), behind) * style.looseness * price /
                 (1.0 + raises * 0.65)).coerceIn(0.025, 0.65)
             val push = smooth(pct, width, 0.025)
             opts += Move.raiseTo(la.maxRaiseTo) to push
-            opts += (if (la.canCheck) Move.CHECK else Move.FOLD) to (1 - push)
-            summary = PolicyReason("短码推牌设定：用全下施压，范围外保留筹码。", "Short-stack preset: shove for pressure, preserve chips outside the range.")
+            val flatWidth = style.shortStackFlat * (1.0 - la.toCall.toDouble() / max(1, me.stack + me.streetBet) / 0.15).coerceIn(0.0, 1.0)
+            val flat = if (!la.canCheck && flatWidth > 0 && raises <= 1) smooth(pct, flatWidth, .02) * (1 - push) * .7 else 0.0
+            if (flat > 0) opts += Move.CALL to flat
+            opts += (if (la.canCheck) Move.CHECK else Move.FOLD) to (1 - push - flat)
+            summary = PolicyReason("短码推牌设定：用全下施压，低价时部分跟注，范围外保留筹码。", "Short-stack preset: shove for pressure, mix cheap calls, preserve chips outside the range.")
             explain("有效筹码 ${number(effBB)} BB；推牌范围中心为前 ${pctText(width)}，面对加注收紧。", "Effective stack ${number(effBB)} BB; shove midpoint top ${pctText(width)}, tighter when facing raises.")
             return Policy(normalized(opts), null, la.toCall.toDouble() / (la.pot + la.toCall), null,
                 reasons = reasons, summary = summary)
@@ -525,7 +528,7 @@ object Bot {
                 opts += Move.FOLD to (1 - pJam)
                 return Policy(normalized(opts), null, 0.0, null, reasons = reasons, summary = summary)
             }
-            var thr = rfiWidth(behind, hu) * style.looseness
+            var thr = max(rfiWidth(behind, hu) * style.looseness, style.openFloor)
             if (limpers > 0) thr *= 0.65
             explain("无人加注时，开池范围中心为前 ${pctText(thr)}；位置越靠后通常范围越宽，有跛入时收紧。起手牌越强于该门槛，加注频率越高。", "Unraised pot: opening-range midpoint top ${pctText(thr)}. Later positions usually open wider; limpers tighten the range. Hands stronger than the midpoint raise more often.")
             summary = PolicyReason(if (pct < thr) "手牌达到当前位置的开池门槛，主动加注争取底池。" else "手牌未达到当前位置的开池门槛，避免投入更多筹码。",
@@ -574,6 +577,16 @@ object Bot {
                 if (isSB) threeBet *= 1.35
                 if (callersAfterRaise > 0) { callTop *= 0.8; threeBet *= 1.1 }
                 if (!ip && !isBB) callTop *= 0.85
+                // Deep cash personas defend a normal live open beyond generic tight chart cutoffs.
+                // Discount the extra width for expensive opens, shallow stacks and poor position.
+                if (style.defendOpen > 0) {
+                    val price = (5.0 / (lastRaise.streetTotal.toDouble() / bb).coerceAtLeast(5.0)).pow(0.8)
+                    val depth = (effBB / 80.0).coerceIn(0.0, 1.0)
+                    val position = if (ip || isBB) 1.0 else 0.85
+                    val width = style.defendOpen * price * depth * position * (if (callersAfterRaise > 0) 0.9 else 1.0)
+                    callTop = max(callTop, width)
+                    threeBet = max(threeBet, width * 0.13 * style.aggression)
+                }
                 callTop = callTop.coerceIn(threeBet, 0.85)
                 explain("价值 3-bet 范围中心为前 ${pctText(threeBet)}，跟注范围上界中心为前 ${pctText(callTop)}；部分同花边缘牌和同花小 A 会加入诈唬加注。", "Value 3-bet midpoint top ${pctText(threeBet)}, call-range cutoff midpoint top ${pctText(callTop)}; some marginal suited hands and suited wheel aces add bluff raises.")
                 val pValue = smooth(pct, threeBet, 0.008)
@@ -680,10 +693,14 @@ object Bot {
                     !initiative && ip && nOpp == 1 && prevAggressor == null -> 0.35  // stab when checked to
                     else -> 0.06
                 }
+                // A check to the caller can be a missed c-bet, not only a fully checked prior street.
+                // Limit probes to heads-up air/draws; avoid turning showdown hands into random bluffs.
+                val probe = if (nOpp == 1 && ip && !initiative && cls <= 1) style.probe * (1.0 - wet * 0.35) else 0.0
                 val medium = if (cls == 2 || cls == 3) 0.6 else 1.0  // medium hands prefer pot control
-                pBet = max(pBet, bluff * style.bluff * multi * medium * (if (street == Street.TURN || street == Street.RIVER) style.lateBarrel else 1.0))
+                pBet = max(pBet, max(probe, bluff * style.bluff * multi * medium * (if (street == Street.TURN || street == Street.RIVER) style.lateBarrel else 1.0)))
             }
-            pBet = pBet.coerceIn(0.0, 0.97)
+            val cap = if (style.probe > 0 && cls == 0 && street != Street.FLOP) 0.78 else 0.97
+            pBet = pBet.coerceIn(0.0, cap)
             if (spr < 1.3 && rel > valueThr) {
                 opts += raiseMove(la, la.maxRaiseTo) to pBet
             } else if (pBet > 0) {

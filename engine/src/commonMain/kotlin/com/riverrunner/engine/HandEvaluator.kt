@@ -30,6 +30,8 @@ object HandEvaluator {
         return -1
     }
 
+    internal fun hasStraightRanks(mask: Int): Boolean = straightHigh[mask] >= 0
+
     fun category(score: Int): Int = score ushr 20
 
     fun evaluate(cards: IntArray): Int = evaluate(Cards.mask(cards))

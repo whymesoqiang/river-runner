@@ -79,13 +79,15 @@ class TableGeometry(val w: Float, val h: Float, val n: Int, val stars: Boolean =
     val crowded = n >= 7 || w < 520f
     val cx = w / 2f
     val cy = h * 0.43f
-    val podW = (if (crowded) 100f else 112f) + if (stars) 30f else 0f
     val podH = 46f
     val miniCardW = if (crowded) 22f else 24f
-    val boardCardW = if (crowded) 32f else if (w < 520f || h < 320f) 34f else 38f
+    val boardCardW = if (n >= 7 && w < 480f) 26f else if (crowded) 32f else if (w < 520f || h < 320f) 34f else 38f
     val boardCardH = boardCardW * 1.4f
     val boardGap = 4f
     val boardW = boardCardW * 5 + boardGap * 4
+    // Reserve the complete board plus a gutter before sizing side pods (portraits included).
+    val podW = ((if (crowded) 100f else 112f) + if (stars) 30f else 0f)
+        .coerceAtMost((w - boardW) / 2f - 20f)
     val boardTop = cy - boardCardH / 2
     val boardBottom = cy + boardCardH / 2
     val heroCardW = if (h < 330f) 44f else 50f
@@ -109,10 +111,13 @@ class TableGeometry(val w: Float, val h: Float, val n: Int, val stars: Boolean =
         val x = cx + (w / 2 - podW / 2 - 6f) * cos(ang).toFloat() * spread
         val y = cy + h * 0.45f * sin(ang).toFloat() -
             if (stars && n == 8 && (rel == 1 || rel == n - 1)) 18f else 0f
-        return Offset(
-            x.coerceIn(podW / 2 + 8f, w - podW / 2 - 4f),
-            y.coerceIn(podH / 2 + 20f, h - podH / 2 - 18f),
-        )
+        val sy = y.coerceIn(podH / 2 + 20f, h - podH / 2 - 18f)
+        var sx = x.coerceIn(podW / 2 + 8f, w - podW / 2 - 8f)
+        if (sy + podH / 2 > boardTop - 8f && sy - podH / 2 < boardBottom + 8f) {
+            sx = if (sx < cx) min(sx, cx - boardW / 2 - podW / 2 - 8f)
+                else maxOf(sx, cx + boardW / 2 + podW / 2 + 8f)
+        }
+        return Offset(sx, sy)
     }
 
     private class Box4(val l: Float, val t: Float, val r: Float, val b: Float)

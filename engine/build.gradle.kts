@@ -10,6 +10,8 @@ kotlin {
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
+            // Opt-in calibration uses environment seeds/output paths and must not be skipped as up-to-date.
+            outputs.upToDateWhen { System.getenv("RR_CALIBRATION_REPORT") == null && System.getenv("RR_LAYOUT_FIXTURE") == null }
             testLogging { events("passed", "failed") }
         }
     }
